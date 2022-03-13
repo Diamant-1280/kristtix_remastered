@@ -27,7 +27,7 @@ export default new Command({
 
         const canvas = createCanvas(1920, 1080)
         const context = canvas.getContext('2d')
-        await registerFont(path.join(__dirname, "../../../../Comfortaa-bold.ttf"), { family: "Comfortaa" })
+        await registerFont(path.join(__dirname, "./../../../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
 
         context.drawImage(banner, 0, 0, 1920, 1080)
         context.fillStyle = "#55555555"

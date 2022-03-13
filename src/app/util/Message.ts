@@ -29,9 +29,7 @@ export default class {
         if (data.Economy.exp >= neededExp) {
             data.Economy.exp = 0
             data.Economy.level += 1
-            await message.channel.send({ embeds: [new MessageEmbed().setDescription(`name: ${message.member.displayName}\nexp: ${data.Economy.exp}\nlevel: ${data.Economy.level}`)] })
         }
-        console.log(data.Economy)
         await db.save('users', data)
     }
 }

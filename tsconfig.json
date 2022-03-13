@@ -53,6 +53,7 @@
 	},
 	"include": [
 		"src/**/*.ts",
+		"src/*.ttf"
 	],
 	"exclude": [
 		"node_modules",
