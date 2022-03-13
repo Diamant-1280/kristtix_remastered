@@ -1,0 +1,61 @@
+{
+	"compilerOptions": {
+		"forceConsistentCasingInFileNames": true,
+		"newLine": "lf",
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"pretty": true,
+		"outDir": "build",
+		"noImplicitAny": true,
+		"moduleResolution": "node",
+		"target": "ES2020",
+		"module": "CommonJS",
+		"esModuleInterop": true,
+		"lib": [
+			"es2020",
+			"dom",
+			"es5",
+			"es6",
+			"dom.iterable"
+		],
+		"sourceMap": true,
+		"types": [
+			"node"
+		],
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": ".",
+		"paths": {
+			"@commands/*": [
+				"src/app/commands/*"
+			],
+			"@events/*": [
+				"src/app/events/*"
+			],
+			"@util/*": [
+				"src/app/util/*"
+			],
+			"@classes/*": [
+				"src/app/classes/*"
+			],
+			"@interfaces/*": [
+				"src/app/interfaces/*"
+			],
+			"@app/*": [
+				"src/app/*"
+			]
+		}
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/*.ttf"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
