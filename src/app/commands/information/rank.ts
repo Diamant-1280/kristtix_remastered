@@ -16,7 +16,7 @@ export default new Command({
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить его карточку ранга!", ephemeral: true})
-        await interaction.deferReply({ ephemeral: true })
+        // await interaction.deferReply({ ephemeral: true })
         const data = await client.db.getOrInsert<User_Interface>('users', { guildID: interaction.guildId, userID: member.id }, User_Basic(user.id, interaction.guildId))
 
         const avatar = await loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
@@ -71,6 +71,6 @@ export default new Command({
         context.drawImage(avatar, 50, 530, 500, 500)
         const file = canvas.toBuffer()
 
-        interaction.editReply({ content: null, files: [file] })
+        interaction.followUp({ content: null, files: [file], ephemeral: true})
     }
 })
