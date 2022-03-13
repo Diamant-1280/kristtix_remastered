@@ -13,6 +13,7 @@ export default new Command({
         type: "USER"
     }],
     run: async ({ interaction }) => {
+        await interaction.deferReply({ ephemeral: true })
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить его карточку ранга!", ephemeral: true})
@@ -71,6 +72,6 @@ export default new Command({
         context.drawImage(avatar, 50, 530, 500, 500)
         const file = canvas.toBuffer()
 
-        interaction.followUp({ content: null, files: [file], ephemeral: true})
+        interaction.editReply({ content: null, files: [file] })
     }
 })
