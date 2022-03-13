@@ -19,8 +19,8 @@ export default new Command({
         // await interaction.deferReply({ ephemeral: true })
         const data = await client.db.getOne<User_Interface>('users', { guildID: interaction.guildId, userID: member.id })
 
-        const avatar = loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
-        const banner = loadImage("https://images-ext-1.discordapp.net/external/vXYC5g1QJc_1SYWELqKbsxOe6pTVxKlf-mfAyvDWuks/%3Fwidth%3D716%26height%3D403/https/media.discordapp.net/attachments/724940553535488041/917212251059003432/568425892.jpg")
+        const avatar = await loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
+        const banner = await loadImage("https://images-ext-1.discordapp.net/external/vXYC5g1QJc_1SYWELqKbsxOe6pTVxKlf-mfAyvDWuks/%3Fwidth%3D716%26height%3D403/https/media.discordapp.net/attachments/724940553535488041/917212251059003432/568425892.jpg")
         const color = "#5555ffff"
         const neededExp = 5 * Math.pow(data.Economy.level, 2) + 50 * data.Economy.level + 100
         const progress = Math.round(1210 * data.Economy.exp / neededExp)
