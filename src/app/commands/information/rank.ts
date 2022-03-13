@@ -3,7 +3,7 @@ import { GuildMember, User } from "discord.js";
 import path from 'path'
 import { client } from "@app/index";
 import { createCanvas, loadImage, registerFont } from 'canvas'
-import { User_Interface } from "@interfaces/MongoDB";
+import { User_Basic, User_Interface } from "@interfaces/MongoDB";
 export default new Command({
     name: "rank",
     description: "Показывает карточку ранга выбранного участника (или у вас)",
@@ -15,9 +15,9 @@ export default new Command({
     run: async ({ interaction }) => {
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
-        if (user.bot) return interaction.reply("Боты не учавствуют в рейтинге, вы не можете запросить его карточку ранга!")
-        // await interaction.deferReply({ ephemeral: true })
-        const data = await client.db.getOne<User_Interface>('users', { guildID: interaction.guildId, userID: member.id })
+        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить его карточку ранга!", ephemeral: true})
+        await interaction.deferReply({ ephemeral: true })
+        const data = await client.db.getOrInsert<User_Interface>('users', { guildID: interaction.guildId, userID: member.id }, User_Basic(user.id, interaction.guildId))
 
         const avatar = await loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
         const banner = await loadImage("https://images-ext-1.discordapp.net/external/vXYC5g1QJc_1SYWELqKbsxOe6pTVxKlf-mfAyvDWuks/%3Fwidth%3D716%26height%3D403/https/media.discordapp.net/attachments/724940553535488041/917212251059003432/568425892.jpg")
@@ -71,6 +71,6 @@ export default new Command({
         context.drawImage(avatar, 50, 530, 500, 500)
         const file = canvas.toBuffer()
 
-        interaction.reply({ content: null, files: [file], ephemeral: true })
+        interaction.editReply({ content: null, files: [file] })
     }
 })
