@@ -2,9 +2,9 @@ import { Command } from "@classes/Command";
 
 export default new Command({
     name: "ping",
-    description: "Отправляет вам в ебало pong x2",
+    description: "Return pong",
     run: async({ interaction }) => {
-        interaction.followUp('Pong! Pong!')
+        interaction.reply({ content: "Pong!"})
     },
     cooldown: 10000
 })
