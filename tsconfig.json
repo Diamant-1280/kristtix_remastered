@@ -53,9 +53,9 @@
 	},
 	"include": [
 		"src/**/*.ts",
-		"src/*.ttf"
 	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		"build"
 	]
 }
