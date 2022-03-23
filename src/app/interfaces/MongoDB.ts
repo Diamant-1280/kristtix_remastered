@@ -1,4 +1,4 @@
-import { Snowflake } from "discord.js"
+import { HexColorString, Snowflake } from "discord.js"
 
 interface Guild_Economy {
     shop: Record<Snowflake, number>,
@@ -38,6 +38,10 @@ export interface User_Interface {
     userID: string,
     guildID: string,
     Economy: User_Economy
+    RankCard: {
+        bannerURL: string,
+        hexColor: HexColorString
+    }
 }
 
 export function User_Basic (user_id: string, guild_id: string): User_Interface {
@@ -49,6 +53,10 @@ export function User_Basic (user_id: string, guild_id: string): User_Interface {
             exp: 0,
             level: 0,
             rep: 0
+        },
+        RankCard: {
+            bannerURL: "https://cdn.discordapp.com/attachments/871442909180878910/918566010548793374/837258.png",
+            hexColor: "#faa923"
         }
     }
 }

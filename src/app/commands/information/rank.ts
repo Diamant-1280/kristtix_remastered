@@ -9,20 +9,19 @@ export default new Command({
     description: "Показывает карточку ранга выбранного участника (или у вас)",
     options: [{
         name: "user",
-        description: "Пользователь, ранг которого вы хотите посмотреть (оставьте пустым чтобы посмотреть свой ранг)",
+        description: "Пользователь, ранг которого вы хотите посмотреть",
         type: "USER"
     }],
     run: async ({ interaction }) => {
         await interaction.deferReply({ ephemeral: true })
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
-        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить его карточку ранга!", ephemeral: true})
-        // await interaction.deferReply({ ephemeral: true })
+        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true})
         const data = await client.db.getOrInsert<User_Interface>('users', { guildID: interaction.guildId, userID: member.id }, User_Basic(user.id, interaction.guildId))
-
+        
         const avatar = await loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
-        const banner = await loadImage("https://images-ext-1.discordapp.net/external/vXYC5g1QJc_1SYWELqKbsxOe6pTVxKlf-mfAyvDWuks/%3Fwidth%3D716%26height%3D403/https/media.discordapp.net/attachments/724940553535488041/917212251059003432/568425892.jpg")
-        const color = "#5555ffff"
+        const banner = await loadImage(data.RankCard.bannerURL)
+        const color = data.RankCard.hexColor
         const neededExp = 5 * Math.pow(data.Economy.level, 2) + 50 * data.Economy.level + 100
         const progress = Math.round(1210 * data.Economy.exp / neededExp)
 
