@@ -13,6 +13,7 @@ export default new Command({
         type: "USER"
     }],
     run: async ({ interaction }) => {
+        registerFont(path.join(__dirname, "./../../../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
         await interaction.deferReply({ ephemeral: true })
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
@@ -27,7 +28,6 @@ export default new Command({
 
         const canvas = createCanvas(1920, 1080)
         const context = canvas.getContext('2d')
-        await registerFont(path.join(__dirname, "./../../../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
 
         context.drawImage(banner, 0, 0, 1920, 1080)
         context.fillStyle = "#55555555"
