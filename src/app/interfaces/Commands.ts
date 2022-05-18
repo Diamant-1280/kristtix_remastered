@@ -1,5 +1,5 @@
 import { ExtendedClient } from "@classes/Client"
-import { ChatInputApplicationCommandData, CommandInteraction, CommandInteractionOptionResolver, GuildMember, PermissionResolvable } from "discord.js"
+import { ChatInputApplicationCommandData, CommandInteraction, CommandInteractionOptionResolver, GuildMember, MessageContextMenuInteraction, PermissionResolvable, UserContextMenuInteraction } from "discord.js"
 
 export interface ExtendedInteraction extends CommandInteraction {
     member: GuildMember

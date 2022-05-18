@@ -1,8 +1,7 @@
 import { Command } from "@classes/Command";
 import { GuildMember, User } from "discord.js";
-import path from 'path'
 import { client } from "@app/index";
-import { createCanvas, loadImage, registerFont } from 'canvas'
+import { createCanvas, loadImage } from 'canvas'
 import { User_Basic, User_Interface } from "@interfaces/MongoDB";
 export default new Command({
     name: "rank",
@@ -12,9 +11,10 @@ export default new Command({
         description: "Пользователь, ранг которого вы хотите посмотреть",
         type: "USER"
     }],
+    nameLocalizations: {ru: "ранг"},
     run: async ({ interaction }) => {
-        registerFont(path.join(__dirname, "./../../../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
         await interaction.deferReply({ ephemeral: true })
+        
         const user: User = interaction.options.getUser('user', false) || interaction.user
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true})

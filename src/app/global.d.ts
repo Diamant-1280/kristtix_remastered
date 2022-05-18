@@ -33,6 +33,7 @@ declare global {
         shuffled(): T[]
     }
 }
+
 declare module 'discord.js' {
     export interface Guild {
         settings: Guild_Interface
@@ -42,4 +43,5 @@ declare module 'discord.js' {
         options: User_Interface
     }
 }
+
 export {}

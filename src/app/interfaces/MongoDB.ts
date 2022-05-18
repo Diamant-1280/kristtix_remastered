@@ -10,6 +10,7 @@ export interface Guild_Interface {
     _id?: any,
     guildID: string,
     ownerID: string,
+    rooms_categoryID: string | null,
     blocked_commands: string[],
     Economy: Guild_Economy
 }
@@ -18,6 +19,7 @@ export function Guild_Basic(id: string, owner_id: string, ): Guild_Interface {
     return {
         guildID: id,
         ownerID: owner_id,
+        rooms_categoryID: null,
         blocked_commands: [],
         Economy: {
             bank: 10000,
@@ -55,8 +57,10 @@ export function User_Basic (user_id: string, guild_id: string): User_Interface {
             rep: 0
         },
         RankCard: {
-            bannerURL: "https://cdn.discordapp.com/attachments/871442909180878910/918566010548793374/837258.png",
-            hexColor: "#faa923"
+            bannerURL: "https://steamuserimages-a.akamaihd.net/ugc/910171378794670871/E2272D6BA9565D84B624496D1D54B6CCF2B8D4DF/",
+            hexColor: "#3d8e6b"
         }
     }
+    
+    
 }

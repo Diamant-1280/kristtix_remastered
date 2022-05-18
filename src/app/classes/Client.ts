@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection /* as BaseClient, Collection */ } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Message } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -10,7 +10,7 @@ import Util from '@util/Message'
 const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
     public commands: Collection<string, CommandType> = new Collection()
-    public owners: string[] = ["516654639480045588"]
+    public owners: string[] = ["516654639480045588", "773496547614392350"]
     public db: MongoDB = new MongoDB(process.env.dataURL)
     public util: Util = new Util(this)
     constructor() {
@@ -52,14 +52,27 @@ export class ExtendedClient extends Client {
         })
         
         this.on("messageCreate", (message) => {
-            if (message.content == "/setup" && this.owners.includes(message.author.id)) {
+            async function Eval (message: Message) {
+                const args = message.content.slice(prefix.length + 1).trim().split(" ")
+                try {
+                    let evaled = eval(args.join(" "));
+                    let eevaled = typeof evaled;
+                    const tyype = eevaled[0].toUpperCase() + eevaled.slice(1);
+                    if (typeof evaled !== "string") evaled = require("util").inspect(evaled);
+                    message.reply("```\n" + evaled + '```')
+                } catch (err) {
+                    message.channel.send("```\n" + err + '```')
+                }
+            }
+            const prefix = '!'
+            if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
+            if (message.content.startsWith(prefix + 'setup') && this.owners.includes(message.author.id)) {
                 this.registerCommands({
-                    commands: slashCommands,
-                    guildId: message.guildId
+                    commands: slashCommands
                 })
-                message.channel.send("Установка команд прошла успешно!")
             }
         })
+           
 
         const eventFiles = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
