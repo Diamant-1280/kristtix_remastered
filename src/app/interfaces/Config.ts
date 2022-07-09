@@ -1,4 +1,4 @@
 export interface Config {
     token: string
-    dataURL: string
+    mongodb_url: string
 }

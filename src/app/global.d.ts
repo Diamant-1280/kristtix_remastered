@@ -10,7 +10,7 @@ declare global {
         interface ProcessEnv {
             token: string
             TOTAL_SHARDS: string
-            dataURL: string
+            mongodb_url: string
             PORT: string
         }
     }

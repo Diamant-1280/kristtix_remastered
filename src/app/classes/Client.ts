@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Message } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -10,8 +10,8 @@ import Util from '@util/Message'
 const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
     public commands: Collection<string, CommandType> = new Collection()
-    public owners: string[] = ["516654639480045588", "773496547614392350"]
-    public db: MongoDB = new MongoDB(process.env.dataURL)
+    public owners: string[] = ["516654639480045588"]
+    public db: MongoDB = new MongoDB(process.env.MONGODB_URL)
     public util: Util = new Util(this)
     constructor() {
         super({
@@ -68,7 +68,9 @@ export class ExtendedClient extends Client {
             if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
             if (message.content.startsWith(prefix + 'setup') && this.owners.includes(message.author.id)) {
                 this.registerCommands({
-                    commands: slashCommands
+                    commands: slashCommands,
+                    guildId: message.guild.id
+                    
                 })
             }
         })

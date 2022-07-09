@@ -15,7 +15,7 @@ export default class MongoDB extends MongoClient {
         await this.login()
     }
 
-    public constructor(url: string = process.env.dataURL) {
+    public constructor(url: string = process.env.MONGODB_URL) {
         super(url)
     }
 
