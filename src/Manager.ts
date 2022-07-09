@@ -21,7 +21,7 @@ export class Manager extends ShardingManager {
 			shard.on('disconnect', () => {
 				console.log(`[SHARDS] Shard ${shard.id} was disconnected`)
 			})
-			shard.on('reconnection', () => {
+			shard.on('reconnecting', () => {
 				console.log(`[SHARDS] Shard ${shard.id} is reconnecting`)
 			})
 			shard.on('death', () => {
