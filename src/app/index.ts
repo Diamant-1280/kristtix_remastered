@@ -4,10 +4,10 @@ import { ExtendedClient } from "@classes/Client"
 import { registerFont } from 'canvas'
 import path from 'path'
 export const client = new ExtendedClient()
-
+require("../../Comf")
 client.start(process.env as Config)
 try {
-    registerFont(path.join(__dirname, "./../../../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
+    registerFont(path.join(__dirname, "./../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
 } catch (e) { console.log(e) }
 
 process.on("unhandledRejection", (reason, promise) => {
