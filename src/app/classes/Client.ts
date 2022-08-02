@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message, MessageAttachment } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -22,7 +22,7 @@ export class ExtendedClient extends Client {
     async importFile(filePath: string) {
         return (await import(filePath))?.default
     }
-    
+
     async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
         if (guildId) {
             this.guilds.cache.get(guildId)?.commands.set(commands)
@@ -35,7 +35,7 @@ export class ExtendedClient extends Client {
 
     async registerModules() {
         const slashCommands: ApplicationCommandDataResolvable[] = []
-        const commandFiles = await globPromise(`${__dirname}/../commands/*/*{.ts,.js}`)
+        const commandFiles: string[] = await globPromise(`${__dirname}/../commands/*/*{.ts,.js}`)
         commandFiles.forEach(async filePath => {
             const command: CommandType = await this.importFile(filePath)
             if (!command.name) return
@@ -50,37 +50,52 @@ export class ExtendedClient extends Client {
                 guildId: guild.id
             })
         })
-        
+
         this.on("messageCreate", (message) => {
-            async function Eval (message: Message) {
-                const args = message.content.slice(prefix.length + 1).trim().split(" ")
+            async function Eval(message: Message): Promise<void> {
+                const args: string[] = message.content.slice(prefix.length + 1).trim().split(" ")
+                const code: string = args.join(" ")
+                async function clean(code: string): Promise<string> {
+                    if (code && code.constructor.name == "Promise")
+                        code = await code;
+                    if (typeof code !== "string")
+                        code = require("util").inspect(code, { depth: 0 })
+                    code = code.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
+                    return code;
+                }
+
                 try {
-                    let evaled = eval(args.join(" "));
-                    let eevaled = typeof evaled;
-                    const tyype = eevaled[0].toUpperCase() + eevaled.slice(1);
-                    if (typeof evaled !== "string") evaled = require("util").inspect(evaled);
-                    message.reply("```\n" + evaled + '```')
+                const evaled: any = args.includes("await") ? eval(`(async () => { ${code} })()`) : eval(code), cleaned = await clean(evaled);
+                const text: string = cleaned.length > 2000 ? "Текст содержит более 2к символов блэт. Выслан ебучий файл." : cleaned;
+                const file: any = cleaned.length > 2000 ? [new MessageAttachment(Buffer.from(`${cleaned}`), "HelloMyFirstOtchim.js" )] : [];
+                await message.reply({ content: `\`\`\`js\n${text}\n\`\`\``, files: file })
                 } catch (err) {
-                    message.channel.send("```\n" + err + '```')
+                    message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\`` })
                 }
             }
-            const prefix = '!'
+            
+            const prefix = '~'
             if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
             if (message.content.startsWith(prefix + 'setup') && this.owners.includes(message.author.id)) {
                 this.registerCommands({
                     commands: slashCommands,
                     guildId: message.guild.id
-                    
+
                 })
             }
         })
-           
 
-        const eventFiles = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
+
+        const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
             const event: Event<keyof ClientEvents> = await this.importFile(filePath)
             this.on(event.event, event.run)
         })
+
+        // const interactFiles = await globPromise(`${__dirname}/../events/interactions/*{.ts,.js}`)
+        // interactFiles.forEach(async filePath => {
+        // const interact: 
+        // })
     }
 
     async start(config: Config): Promise<void> {

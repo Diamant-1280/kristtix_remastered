@@ -23,9 +23,9 @@ export default class {
 
     private async Economy_Update(message: Message, [data, res]: [User_Interface, Guild_Interface]): Promise<void> {
         const { db } = this.client
-        const givedExp = Math.floor((Math.floor(Math.random() * 11) + 15) * res.Economy.exp_bonus)
-        const neededExp = 5 * Math.pow(data.Economy.level, 2) + 50 * data.Economy.level + 100
-        data.Economy.exp += givedExp
+        const givenExp = Math.floor((Math.floor(Math.random() * 11) + 15) * res.Economy.exp_bonus)
+        const neededExp = 5 * data.Economy.level ** 2 + 50 * data.Economy.level + 100
+        data.Economy.exp += givenExp
         if (data.Economy.exp >= neededExp) {
             data.Economy.exp = 0
             data.Economy.level += 1
