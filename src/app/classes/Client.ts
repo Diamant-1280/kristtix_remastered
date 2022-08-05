@@ -73,7 +73,7 @@ export class ExtendedClient extends Client {
                 }
             }
 
-            const prefix = '!'
+            const prefix = '~'
             if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
             if (message.content.startsWith(prefix + 'setup') && this.owners.includes(message.author.id)) {
                 this.registerCommands({
