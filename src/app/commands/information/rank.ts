@@ -1,26 +1,34 @@
 import { Command } from "@classes/Command";
-import { GuildMember, User } from "discord.js";
+import { ApplicationCommandOptionType, GuildMember, User } from "discord.js";
 import { client } from "@app/index";
 import { createCanvas, loadImage } from 'canvas'
 import { User_Basic, User_Interface } from "@interfaces/MongoDB";
 export default new Command({
-    name: "rank",
+    name: "ранг",
     description: "Показывает карточку ранга выбранного участника (или у вас)",
     options: [{
         name: "user",
-        description: "Пользователь, ранг которого вы хотите посмотреть",
-        type: "USER"
+        description: "Участник, ранг которого вы хотите посмотреть",
+        type: ApplicationCommandOptionType.User,
+        nameLocalizations: { ru: "участник" }
+    }, {
+        name: "hide",
+        description: "Укажите, нужно ли отослать результат команды всем в чате",
+        type: ApplicationCommandOptionType.Boolean,
+        nameLocalizations: { ru: "скрыть"}
     }],
-    nameLocalizations: {ru: "ранг"},
+
     run: async ({ interaction }) => {
-        await interaction.deferReply({ ephemeral: true })
-        
         const user: User = interaction.options.getUser('user', false) || interaction.user
+        const hide: boolean = interaction.options.getBoolean('hide', false) || false
+
+        await interaction.deferReply({ ephemeral: hide })
+
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true})
         const data = await client.db.getOrInsert<User_Interface>('users', { guildID: interaction.guildId, userID: member.id }, User_Basic(user.id, interaction.guildId))
         
-        const avatar = await loadImage(user.displayAvatarURL({ format: "png", size: 512 }))
+        const avatar = await loadImage(user.displayAvatarURL({ extension: "png" , size: 512 }))
         const banner = await loadImage(data.RankCard.bannerURL)
         const color = data.RankCard.hexColor
         const neededExp = 5 * Math.pow(data.Economy.level, 2) + 50 * data.Economy.level + 100
@@ -55,7 +63,7 @@ export default new Command({
         fillRoundedRect(640, 950, 1210, 80, 40)
 
         context.fillStyle = color
-        if (progress >= 80) fillRoundedRect(640, 950, progress, 80, 40)
+        if (progress >= 80 || progress < 0) fillRoundedRect(640, 950, progress, 80, 40)
 
         context.beginPath()
         context.arc(300, 780, 270, 0, Math.PI * 2, true)

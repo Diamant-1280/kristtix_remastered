@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message, MessageAttachment } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message, AttachmentBuilder } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -6,13 +6,12 @@ import { promisify } from "util"
 import { Event } from '@classes/Event'
 import MongoDB from '@classes/MongoDB'
 import glob from 'glob'
-import Util from '@util/Message'
 const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
+    public talkedRecently: Set<String> = new Set()
     public commands: Collection<string, CommandType> = new Collection()
     public owners: string[] = ["516654639480045588"]
     public db: MongoDB = new MongoDB(process.env.MONGODB_URL)
-    public util: Util = new Util(this)
     constructor() {
         super({
             intents: 32767
@@ -65,16 +64,16 @@ export class ExtendedClient extends Client {
                 }
 
                 try {
-                const evaled: any = args.includes("await") ? eval(`(async () => { ${code} })()`) : eval(code), cleaned = await clean(evaled);
-                const text: string = cleaned.length > 2000 ? "Текст содержит более 2к символов блэт. Выслан ебучий файл." : cleaned;
-                const file: any = cleaned.length > 2000 ? [new MessageAttachment(Buffer.from(`${cleaned}`), "HelloMyFirstOtchim.js" )] : [];
-                await message.reply({ content: `\`\`\`js\n${text}\n\`\`\``, files: file })
+                    const evaled: any = args.includes("await") ? eval(`(async () => { ${code} })()`) : eval(code), cleaned = await clean(evaled);
+                    const text: string = cleaned.length > 2000 ? "Текст содержит более 2к символов блэт. Выслан ебучий файл." : cleaned;
+                    const file: any = cleaned.length > 2000 ? [new AttachmentBuilder(Buffer.from(`${cleaned}`), { name: "HelloMyFirstOtchim.js" })] : [];
+                    await message.reply({ content: `\`\`\`js\n${text}\n\`\`\``, files: file })
                 } catch (err) {
                     message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\`` })
                 }
             }
-            
-            const prefix = '~'
+
+            const prefix = '!'
             if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
             if (message.content.startsWith(prefix + 'setup') && this.owners.includes(message.author.id)) {
                 this.registerCommands({
@@ -91,11 +90,6 @@ export class ExtendedClient extends Client {
             const event: Event<keyof ClientEvents> = await this.importFile(filePath)
             this.on(event.event, event.run)
         })
-
-        // const interactFiles = await globPromise(`${__dirname}/../events/interactions/*{.ts,.js}`)
-        // interactFiles.forEach(async filePath => {
-        // const interact: 
-        // })
     }
 
     async start(config: Config): Promise<void> {
