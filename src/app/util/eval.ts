@@ -1,6 +1,14 @@
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from "discord.js";
 import { client } from "@app/index";
 export default async function Eval(message: Message): Promise<void> {
+    const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(
+            new ButtonBuilder()
+                .setEmoji("873618668574101584")
+                .setStyle(ButtonStyle.Danger)
+                .setCustomId("delete_message")
+        )
+
     const args: string[] = message.content.slice(5, message.content.length - 3).trim().split(" ")
     const code: string = args.join(" ")
     async function clean(code: string): Promise<string> {
@@ -11,14 +19,6 @@ export default async function Eval(message: Message): Promise<void> {
         code = code.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
         return code;
     }
-
-    const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(
-            new ButtonBuilder()
-                .setEmoji("873618668574101584")
-                .setStyle(ButtonStyle.Danger)
-                .setCustomId("delete_message")
-        )
 
     try {
         const evaled: any = args.includes("await") ? eval(`(async () => { ${code} })()`) : eval(code), cleaned = await clean(evaled);
@@ -31,8 +31,7 @@ export default async function Eval(message: Message): Promise<void> {
 
     const collector = message.channel.createMessageComponentCollector({
         filter: (i => i.customId === 'delete_message' && client.owners.includes(i.member.id)),
-        componentType: ComponentType.Button,
-        max: 1
+        componentType: ComponentType.Button
     })
 
     collector.on("collect", i => {
@@ -40,4 +39,3 @@ export default async function Eval(message: Message): Promise<void> {
         if (message.deletable) message.delete()
     })
 }
-// }
