@@ -28,8 +28,9 @@ export default async function Eval(message: Message): Promise<void> {
     } catch (err) {
         message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\``, components: [evalActionRow] })
     }
+
     const collector = message.channel.createMessageComponentCollector({
-        filter: i => client.owners.includes(message.author.id) && i.customId === "message_delete",
+        filter: (i => i.customId === 'delete_message' && client.owners.includes(i.member.id)),
         componentType: ComponentType.Button,
         max: 1
     })
