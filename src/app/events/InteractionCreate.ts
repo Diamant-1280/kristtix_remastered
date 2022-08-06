@@ -12,10 +12,4 @@ export default new Event('interactionCreate', async (interaction) => {
             interaction: interaction as ExtendedInteraction
         })
     }
-
-    // if(interaction.isButton()) {
-    //     if (interaction.customId === "delete_message") {
-    //         interaction.message.delete()
-    //     }
-    // }
 })
