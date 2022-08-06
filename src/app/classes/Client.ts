@@ -14,7 +14,7 @@ export class ExtendedClient extends Client {
     public db: MongoDB = new MongoDB(process.env.MONGODB_URL)
     constructor() {
         super({
-            intents: 32767
+            intents: [ 'Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent' ]
         })
     }
 
@@ -50,7 +50,7 @@ export class ExtendedClient extends Client {
             })
         })
 
-        this.on("messageCreate", (message) => {
+        /* this.on("messageCreate", (message) => {
             async function Eval(message: Message): Promise<void> {
                 const args: string[] = message.content.slice(prefix.length + 1).trim().split(" ")
                 const code: string = args.join(" ")
@@ -82,7 +82,7 @@ export class ExtendedClient extends Client {
 
                 })
             }
-        })
+        // }) */
 
 
         const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)

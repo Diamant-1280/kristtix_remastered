@@ -2,9 +2,11 @@ import { Event } from "@classes/Event"
 import { client } from "@app/index"
 import { Guild_Basic, Guild_Interface, User_Basic, User_Interface } from "@interfaces/MongoDB";
 import { ChannelType, Message } from "discord.js";
+import Eval from "@util/eval";
 export default new Event('messageCreate', async (message) => {
-    if (!message || message.channel.type === ChannelType.DM || message.author.bot) return
-
+    if (!message || message.author.bot) return
+    if (message.content.startsWith('```js') && message.content.endsWith('```')) return Eval.call(client, message)
+    if (message.channel.type === ChannelType.DM) return
     const [res, data]: [Guild_Interface, User_Interface] = await database_check(message.guildId, message.author.id, message.guild.ownerId)
     if (data && res) await economy_update(message, [data, res])
 
@@ -16,7 +18,7 @@ export default new Event('messageCreate', async (message) => {
     }
 
     async function economy_update(message: Message, [data, res]: [User_Interface, Guild_Interface]): Promise<void> {
-        if (!client.talkedRecently.has(message.author.id)) return
+        if (client.talkedRecently.has(message.author.id)) return
         const { db } = client
         const givenExp: number = Math.floor(Math.random() * 11) + 15
         const neededExp: number = 5 * data.Economy.level ** 2 + 50 * data.Economy.level + 100
