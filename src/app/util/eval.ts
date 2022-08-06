@@ -1,10 +1,10 @@
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ComponentType, Interaction, Message } from "discord.js";
 import { client } from "@app/index";
 export default async function Eval(message: Message): Promise<void> {
     const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             new ButtonBuilder()
-                ,setLabel("Удалить")
+                .setLabel("Удалить")
                 .setEmoji("873618668574101584")
                 .setStyle(ButtonStyle.Danger)
                 .setCustomId(message.id)
@@ -35,7 +35,7 @@ export default async function Eval(message: Message): Promise<void> {
         componentType: ComponentType.Button,
         maxComponents: 1,
         max: 1,
-        idle: 60 * 1000
+        idle: 5 * 60 * 1000
     })
 
     collector.on("collect", i => {
