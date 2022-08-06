@@ -33,7 +33,6 @@ export default async function Eval(message: Message): Promise<void> {
     const collector = message.channel.createMessageComponentCollector({
         filter: (i => i.customId === message.id && client.owners.includes(i.member.id)),
         componentType: ComponentType.Button,
-        maxComponents: 1,
         idle: 5 * 60 * 1000
     })
 
