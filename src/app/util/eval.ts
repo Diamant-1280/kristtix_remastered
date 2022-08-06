@@ -4,9 +4,10 @@ export default async function Eval(message: Message): Promise<void> {
     const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             new ButtonBuilder()
+                ,setLabel("Удалить")
                 .setEmoji("873618668574101584")
                 .setStyle(ButtonStyle.Danger)
-                .setCustomId("delete_message")
+                .setCustomId(message.id)
         )
 
     const args: string[] = message.content.slice(5, message.content.length - 3).trim().split(" ")
@@ -30,7 +31,7 @@ export default async function Eval(message: Message): Promise<void> {
     }
 
     const collector = message.channel.createMessageComponentCollector({
-        filter: (i => i.customId === 'delete_message' && client.owners.includes(i.member.id)),
+        filter: (i => i.customId === message.id && client.owners.includes(i.member.id)),
         componentType: ComponentType.Button,
         maxComponents: 1,
         max: 1,
