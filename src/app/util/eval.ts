@@ -34,7 +34,6 @@ export default async function Eval(message: Message): Promise<void> {
         filter: (i => i.customId === message.id && client.owners.includes(i.member.id)),
         componentType: ComponentType.Button,
         maxComponents: 1,
-        max: 1,
         idle: 5 * 60 * 1000
     })
 
