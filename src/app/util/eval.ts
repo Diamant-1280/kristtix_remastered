@@ -32,6 +32,9 @@ export default async function Eval(message: Message): Promise<void> {
     const collector = message.channel.createMessageComponentCollector({
         filter: (i => i.customId === 'delete_message' && client.owners.includes(i.member.id)),
         componentType: ComponentType.Button,
+        maxComponents: 1,
+        max: 1,
+        idle: 60 * 1000
     })
 
     collector.on("collect", i => {
