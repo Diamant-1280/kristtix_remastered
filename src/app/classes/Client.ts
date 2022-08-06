@@ -9,6 +9,7 @@ import glob from 'glob'
 const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
     public talkedRecently: Set<String> = new Set()
+    public slashCommands: ApplicationCommandDataResolvable[] = []
     public commands: Collection<string, CommandType> = new Collection()
     public owners: string[] = ["516654639480045588"]
     public db: MongoDB = new MongoDB(process.env.MONGODB_URL)
@@ -33,19 +34,19 @@ export class ExtendedClient extends Client {
     }
 
     async registerModules() {
-        const slashCommands: ApplicationCommandDataResolvable[] = []
+        
         const commandFiles: string[] = await globPromise(`${__dirname}/../commands/*/*{.ts,.js}`)
         commandFiles.forEach(async filePath => {
             const command: CommandType = await this.importFile(filePath)
             if (!command.name) return
 
             this.commands.set(command.name, command)
-            slashCommands.push(command)
+            this.slashCommands.push(command)
         })
 
         this.on("guildCreate", (guild) => {
             this.registerCommands({
-                commands: slashCommands,
+                commands: this.slashCommands,
                 guildId: guild.id
             })
         })
@@ -71,7 +72,11 @@ export class ExtendedClient extends Client {
                 } catch (err) {
                     message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\`` })
                 }
-            }
+            this.registerCommands({
+                    commands: slashCommands,
+                    guildId: message.guild.id
+
+                })}
 
             const prefix = '~'
             if (message.content.startsWith(prefix + 'e') && this.owners.includes(message.author.id)) Eval.call(this, (message))
