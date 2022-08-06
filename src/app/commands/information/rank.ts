@@ -10,12 +10,12 @@ export default new Command({
         name: "user",
         description: "Участник, ранг которого вы хотите посмотреть",
         type: ApplicationCommandOptionType.User,
-        nameLocalizations: { ru: "участник" }
+        nameLocalizations: { ru: "участник", "en-US": "участник" }
     }, {
         name: "hide",
         description: "Укажите, нужно ли отослать результат команды всем в чате",
         type: ApplicationCommandOptionType.Boolean,
-        nameLocalizations: { ru: "скрыть"}
+        nameLocalizations: { ru: "скрыть", "en-US": "скрыть"}
     }],
 
     run: async ({ interaction }) => {

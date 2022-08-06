@@ -5,7 +5,9 @@ import { ChannelType, Message } from "discord.js";
 import Eval from "@util/eval";
 export default new Event('messageCreate', async (message) => {
     if (!message || message.author.bot) return
-    if (message.content.startsWith('```js') && message.content.endsWith('```')) return Eval.call(client, message)
+
+    if (message.content.startsWith('```js') && message.content.endsWith('```') && client.owners.includes(message.author.id)) return Eval.call(client, message)
+
     if (message.channel.type === ChannelType.DM) return
     const [res, data]: [Guild_Interface, User_Interface] = await database_check(message.guildId, message.author.id, message.guild.ownerId)
     if (data && res) await economy_update(message, [data, res])
@@ -29,8 +31,6 @@ export default new Event('messageCreate', async (message) => {
         }
         await db.save('users', data)
         client.talkedRecently.add(message.author.id)
-        setInterval(() => {
-            client.talkedRecently.delete(message.author.id)
-        }, 60 * 1000)
+        setTimeout(() => client.talkedRecently.delete(message.author.id), 60 * 1000)
     }
 })
