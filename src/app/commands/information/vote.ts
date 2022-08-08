@@ -18,32 +18,32 @@ export default new Command({
             type: ApplicationCommandOptionType.String,
             required: true
         }, {
-            name: "1st-answer",
-            nameLocalizations: {ru: "первый ответ"},
+            name: "1st_answer",
+            nameLocalizations: {ru: "первый_ответ"},
             description: "Укажите текст первого ответа",
             type: ApplicationCommandOptionType.String,
             required: true
         },
         {
-            name: "2nd-answer",
-            nameLocalizations: {ru: "второй ответ"},
+            name: "2nd_answer",
+            nameLocalizations: {ru: "второй_ответ"},
             description: "Укажите текст первого ответа",
             type: ApplicationCommandOptionType.String,
             required: true
         },
         {
-            name: "3rd-answer",
-            nameLocalizations: {ru: "третий ответ"},
+            name: "3rd_answer",
+            nameLocalizations: {ru: "третий_ответ"},
             description: "Укажите текст первого ответа",
             type: ApplicationCommandOptionType.String,
         }, {
-            name: "4th-answer",
-            nameLocalizations: {ru: "четвертый ответ"},
+            name: "4th_answer",
+            nameLocalizations: {ru: "четвертый_ответ"},
             description: "Укажите текст первого ответа",
             type: ApplicationCommandOptionType.String,
         }, {
-            name: "5th-answer",
-            nameLocalizations: {ru: "пятый ответ"},
+            name: "5th_answer",
+            nameLocalizations: {ru: "пятый_ответ"},
             description: "Укажите текст первого ответа",
             type: ApplicationCommandOptionType.String,
         }
