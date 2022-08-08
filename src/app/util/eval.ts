@@ -7,7 +7,7 @@ export default async function Eval(message: Message): Promise<void> {
                 .setLabel("Удалить")
                 .setEmoji("873618668574101584")
                 .setStyle(ButtonStyle.Danger)
-                .setCustomId(`del_${message.id}`)
+                .setCustomId(`del_${message.id}_${message.author.id}`)
         )
 
     const args: string[] = message.content.slice(5, message.content.length - 3).trim().split(" ")

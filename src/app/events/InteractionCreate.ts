@@ -15,9 +15,15 @@ export default new Event('interactionCreate', async (interaction) => {
 
     if (interaction.isButton()) {
         if (interaction.customId.startsWith("del_")) {
-            const msg: Message = interaction.channel.messages.cache.get(interaction.customId.slice(4))
-            interaction.message.delete()
+            if (interaction.user.id != interaction.customId.slice(23, 41)) return interaction.followUp({
+                ephemeral: true,
+                content: "Вы не можете удалить это сообщение, оно вам не пренадлежит!"
+            })
+            const msgId: string = interaction.customId.slice(4, 22)
+            await interaction.channel.messages.fetch(msgId)
+            const msg: Message = interaction.channel.messages.cache.get(msgId)
             if (msg.deletable) msg.delete()
+            interaction.message.delete()
         }
     }
 })
