@@ -15,7 +15,7 @@ export default new Event('interactionCreate', async (interaction) => {
 
     if (interaction.isButton()) {
         if (interaction.customId.startsWith("del_")) {
-            const msg: Message = await interaction.channel.messages.fetch(interaction.customId.slice(4))
+            const msg: Message = interaction.channel.messages.cache.get(interaction.customId.slice(4))
             interaction.message.delete()
             if (msg.deletable) msg.delete()
         }
