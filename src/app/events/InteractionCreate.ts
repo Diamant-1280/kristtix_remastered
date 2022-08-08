@@ -21,7 +21,7 @@ export default new Event('interactionCreate', async (interaction) => {
                 content: "Вы не можете удалить это сообщение, оно вам не пренадлежит!"
             })
             const msg: Message = interaction.channel.messages.cache.get(givenInfo.at(1))
-            if (msg.deletable) msg.delete()
+            if (msg) msg.delete()
             interaction.message.delete()
         }
     }
