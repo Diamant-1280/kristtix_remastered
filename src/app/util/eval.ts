@@ -7,7 +7,7 @@ export default async function Eval(message: Message): Promise<void> {
                 .setLabel("Удалить")
                 .setEmoji("873618668574101584")
                 .setStyle(ButtonStyle.Danger)
-                .setCustomId(message.id)
+                .setCustomId(`del_$[message.id}`)
         )
 
     const args: string[] = message.content.slice(5, message.content.length - 3).trim().split(" ")
@@ -29,15 +29,4 @@ export default async function Eval(message: Message): Promise<void> {
     } catch (err) {
         message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\``, components: [evalActionRow] })
     }
-
-    const collector = message.channel.createMessageComponentCollector({
-        filter: (i => i.customId === message.id && client.owners.includes(i.member.id)),
-        componentType: ComponentType.Button,
-        idle: 5 * 60 * 1000
-    })
-
-    collector.on("collect", i => {
-        i.message.delete()
-        if (message.deletable) message.delete()
-    })
 }
