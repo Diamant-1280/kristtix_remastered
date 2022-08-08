@@ -16,7 +16,7 @@ export default new Event('interactionCreate', async (interaction) => {
     if (interaction.isButton()) {
         const givenInfo: string[] = interaction.customId.split("_") 
         if (interaction.customId.startsWith("del_")) {
-            if (interaction.member.user.id != givenInfo.at(2)) return interaction.reply({
+            if (interaction.user.id != givenInfo.at(2)) return interaction.reply({
                 ephemeral: true,
                 content: "Вы не можете удалить это сообщение, оно вам не пренадлежит!"
             })
