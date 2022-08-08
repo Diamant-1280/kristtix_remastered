@@ -19,9 +19,7 @@ export default new Event('interactionCreate', async (interaction) => {
                 ephemeral: true,
                 content: "Вы не можете удалить это сообщение, оно вам не пренадлежит!"
             })
-            const msgId: string = interaction.customId.slice(4, 22)
-            await interaction.channel.messages.fetch(msgId)
-            const msg: Message = interaction.channel.messages.cache.get(msgId)
+            const msg: Message = interaction.channel.messages.cache.get(interaction.customId.slice(4, 22))
             if (msg.deletable) msg.delete()
             interaction.message.delete()
         }
