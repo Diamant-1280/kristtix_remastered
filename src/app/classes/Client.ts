@@ -44,24 +44,26 @@ export class ExtendedClient extends Client {
             this.slashCommands.push(command)
         })
 
-        this.on("guildCreate", (guild) => {
-            this.registerCommands({
-                commands: this.slashCommands,
-                guildId: guild.id
-            })
-        })
+        // this.on("guildCreate", (guild) => {
+        //     this.registerCommands({
+        //         commands: this.slashCommands,
+        //         guildId: guild.id
+        //     })
+        // })
 
+        
         const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
             const event: Event<keyof ClientEvents> = await this.importFile(filePath)
             this.on(event.event, event.run)
         })
     }
-
+    
     async start(config: Config): Promise<void> {
         await this.db.connect()
         await this.registerModules()
         await this.login(config.token)
+        this.registerCommands({ commands: this.slashCommands })
     }
 
 }

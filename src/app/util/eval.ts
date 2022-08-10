@@ -1,5 +1,4 @@
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from "discord.js";
-import { client } from "@app/index";
 export default async function Eval(message: Message): Promise<void> {
     const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
