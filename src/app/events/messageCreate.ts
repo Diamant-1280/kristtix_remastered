@@ -29,7 +29,7 @@ export default new Event('messageCreate', async (message) => {
             data.rating.exp = 0
             data.rating.level += 1
         }
-        await db.save('users', data)
+        await db.save('guild-users', data)
         client.talkedRecently.add(message.author.id)
         setTimeout(() => client.talkedRecently.delete(message.author.id), 60 * 1000)
     }
