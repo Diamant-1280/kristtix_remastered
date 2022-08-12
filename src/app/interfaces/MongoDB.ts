@@ -1,4 +1,5 @@
 import { HexColorString, Snowflake } from "discord.js"
+import { URL } from "url"
 
 interface Guild_Economy {
     shop: Record<Snowflake, number>,
@@ -8,51 +9,53 @@ interface Guild_Economy {
 
 export interface Guild_Interface {
     _id?: any,
-    guildID: string,
-    ownerID: string,
+    guildID: string
     blocked_commands: string[]
 }
 
-export function Guild_Basic(id: string, owner_id: string, ): Guild_Interface {
+export function Guild_Basic(id: string): Guild_Interface {
     return {
         guildID: id,
-        ownerID: owner_id,
         blocked_commands: []
     }
 }
-export interface User_Economy {
-    balance: number,
-    exp: number,
-    level: number,
-    rep: number
+
+export interface Guild_User_Interface {
+    _id?: any,
+    userID: string,
+    guildID: string,
+    rating: {
+        level: number,
+        exp: number
+    }
+}
+
+export function Guild_User_Basic(user_id: string, guild_id: string): Guild_User_Interface {
+    return {
+        userID: user_id,
+        guildID: guild_id,
+        rating: {
+            level: 0,
+            exp: 0
+        }
+    }
 }
 
 export interface User_Interface {
     _id?: any,
     userID: string,
-    guildID: string,
-    Economy: User_Economy
-    RankCard: {
-        bannerURL: string,
-        hexColor: HexColorString
-    }
+    rankCard: {
+        color: HexColorString,
+        url: `https://${string}/${string}`
+    } 
 }
 
-export function User_Basic (user_id: string, guild_id: string): User_Interface {
+export function User_Basic(user_id: string): User_Interface {
     return {
         userID: user_id,
-        guildID: guild_id,
-        Economy: {
-            balance: 0,
-            exp: 0,
-            level: 0,
-            rep: 0
-        },
-        RankCard: {
-            bannerURL: "https://steamuserimages-a.akamaihd.net/ugc/910171378794670871/E2272D6BA9565D84B624496D1D54B6CCF2B8D4DF/",
-            hexColor: "#3d8e6b"
+        rankCard: {
+            color: "#",
+            url: "https://images5.alphacoders.com/862/thumb-1920-862186.png"
         }
     }
-    
-    
 }
