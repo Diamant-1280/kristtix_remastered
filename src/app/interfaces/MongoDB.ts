@@ -11,8 +11,6 @@ export interface Guild_Interface {
     guildID: string,
     ownerID: string,
     blocked_commands: string[]
-    // rooms_categoryID: string | null,
-    // Economy: Guild_Economy
 }
 
 export function Guild_Basic(id: string, owner_id: string, ): Guild_Interface {
@@ -20,12 +18,6 @@ export function Guild_Basic(id: string, owner_id: string, ): Guild_Interface {
         guildID: id,
         ownerID: owner_id,
         blocked_commands: []
-        // rooms_categoryID: null,
-        // Economy: {
-        //     bank: 10000,
-        //     exp_bonus: 1.0,
-        //     shop: Object()
-        // }
     }
 }
 export interface User_Economy {
