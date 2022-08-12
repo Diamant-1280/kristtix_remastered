@@ -34,7 +34,6 @@ export class ExtendedClient extends Client {
     }
 
     async registerModules() {
-        
         const commandFiles: string[] = await globPromise(`${__dirname}/../commands/*/*{.ts,.js}`)
         commandFiles.forEach(async filePath => {
             const command: CommandType = await this.importFile(filePath)
@@ -50,7 +49,6 @@ export class ExtendedClient extends Client {
         //         guildId: guild.id
         //     })
         // })
-
         
         const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
@@ -63,7 +61,7 @@ export class ExtendedClient extends Client {
         await this.db.connect()
         await this.registerModules()
         await this.login(config.token)
-        this.registerCommands({ commands: this.slashCommands })
+        // this.меregisterCommands({ commands: this.slashCommands })
     }
 
 }

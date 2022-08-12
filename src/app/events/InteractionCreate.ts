@@ -8,6 +8,18 @@ export default new Event('interactionCreate', async (interaction) => {
         return
     }
 
+    // if (interaction.isSelectMenu()) {
+    //     if (interaction.customId.startsWith('vote_')) {
+    //         const givedInformation = interaction.customId.split("_")
+    //         if (givedInformation.at(1) === 'disabled') {
+    //             interaction.reply({
+    //                 ephemeral: true,
+    //                 content: `<:disabled:918562727134371840> Опрос завершился в <t:${givedInformation.at(2)}:R>!`
+    //             })
+    //         }
+    //     }
+    // }
+
     if (interaction.isCommand()) {
         const command: CommandType = client.commands.get(interaction.commandName)
         if (!command) return interaction.reply("Извините, данная интеграция более не доступна.\nОбратитесь за поддержкой [сюда](https://discord.gg/kuNSEksg)")

@@ -1,0 +1,163 @@
+import { Command } from "@classes/Command";
+import {
+    ActionRowBuilder, AnyComponentBuilder, ApplicationCommandOptionType, Colors,
+    ComponentType, EmbedBuilder, InteractionCollector,
+    SelectMenuBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction, SelectMenuOptionBuilder
+} from "discord.js";
+export default new Command({
+    name: "vote",
+    nameLocalizations: { ru: "голосование" },
+    description: "Создает сообщение с голосованием",
+    run: async ({ interaction }) => {
+        if (!interaction.inCachedGuild) return
+        const time = interaction.options.getNumber('time') || 15
+        const question = interaction.options.getString('question')
+        const alreadyVoted: Set<string> = new Set()
+
+        const embed: EmbedBuilder = new EmbedBuilder()
+            .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+            .setColor(Colors.Green)
+            .setFooter({ text: "Время окончания опроса" })
+            .setTimestamp(Date.now() + time * 60 * 1000)
+
+        if (question.length <= 256) embed.setTitle(question)
+        else embed.setDescription(question)
+
+        const answerPrefixes: string[] = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th']
+        const emojis: string[] = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+        const voited: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        function createMessageActionRow(disabled?: boolean): ActionRowBuilder<SelectMenuBuilder> {
+            const answers: string[] = answerPrefixes.map(x => {
+                return interaction.options.getString(`${x}_answer`)
+            }).filter(x => x)
+
+            const selectComponents: SelectMenuComponentOptionData[] = answers.map((x, i) => {
+                return {
+                    label: `[${voited[i]}] ${answers[i]}`,
+                    value: answerPrefixes[i],
+                    emoji: emojis[i]
+                }
+            })
+
+            const selectMenu: SelectMenuBuilder = new SelectMenuBuilder()
+                .addOptions(selectComponents)
+                .setCustomId(`vote_${interaction.id}`)
+            if (disabled) selectMenu.setCustomId(`vote_disabled_${(Date.now() / 1000) + time}`).setPlaceholder(`Опрос был завершен`)
+            const actionRow: ActionRowBuilder<SelectMenuBuilder> = new ActionRowBuilder<SelectMenuBuilder>().addComponents(selectMenu)
+            return actionRow
+        }
+
+        const oldActionRow = createMessageActionRow()
+
+        interaction.reply({ embeds: [embed], components: [oldActionRow] })
+
+        const collector: InteractionCollector<SelectMenuInteraction> = interaction.channel.createMessageComponentCollector({
+            filter: int => int.customId == `vote_${interaction.id}`,
+            componentType: ComponentType.SelectMenu,
+            time: 1000//time * 60 * 1000
+        })
+
+        collector.on('collect', async (int) => {
+            if (!int.inCachedGuild()) return
+            if (alreadyVoted.has(int.member.id)) {
+                int.reply({ content: "<:disabled:918562727134371840> Вы уже проголосовали!", ephemeral: true })
+                return
+            }
+            else int.reply({ content: "<:enabled:918562727314722917> Ваш голос сохранён!", ephemeral: true })
+
+            voited[answerPrefixes.indexOf(int.values[0])] += 1
+            alreadyVoted.add(int.member.id)
+
+            const newActionRow: ActionRowBuilder<SelectMenuBuilder> = createMessageActionRow()
+            interaction.editReply({ embeds: [embed], components: [newActionRow] })
+        })
+
+        collector.on(`end`, (int, reason) => {
+            const newestActionRow: ActionRowBuilder<SelectMenuBuilder> = createMessageActionRow(true)
+            interaction.editReply({ embeds: [embed], components: [newestActionRow] })
+        })
+    },
+    options: [
+        {
+            name: "question",
+            nameLocalizations: { ru: "вопрос" },
+            description: "Укажите сообщение с вопросом",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            minLength: 5,
+            maxLength: 500
+        }, {
+            name: "1st_answer",
+            nameLocalizations: { ru: "первый_вариант" },
+            description: "Укажите текст первого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            maxLength: 100
+        }, {
+            name: "2nd_answer",
+            nameLocalizations: { ru: "второй_вариант" },
+            description: "Укажите текст второго варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            maxLength: 100
+        }, {
+            name: "3rd_answer",
+            nameLocalizations: { ru: "третий_вариант" },
+            description: "Укажите текст третьего варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "4th_answer",
+            nameLocalizations: { ru: "четвертый_вариант" },
+            description: "Укажите текст четвертого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "5th_answer",
+            nameLocalizations: { ru: "пятый_вариант" },
+            description: "Укажите текст пятого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "6th_answer",
+            nameLocalizations: { ru: "шестой_вариант" },
+            description: "Укажите текст шестого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "7th_answer",
+            nameLocalizations: { ru: "сельмой_вариант" },
+            description: "Укажите текст седьмого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "8th_answer",
+            nameLocalizations: { ru: "восьмой_вариант" },
+            description: "Укажите текст восьмого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "9th_answer",
+            nameLocalizations: { ru: "девятый_вариант" },
+            description: "Укажите текст девятого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "10th_answer",
+            nameLocalizations: { ru: "десятый_вариант" },
+            description: "Укажите текст десятого варианта ответа",
+            type: ApplicationCommandOptionType.String,
+            maxLength: 100
+        }, {
+            name: "time",
+            nameLocalizations: { ru: "время" },
+            description: "Укажите в минутах сколько будет активен опрос (максимум 1 час)",
+            type: ApplicationCommandOptionType.Number,
+            minValue: 1,
+            maxValue: 60,
+            required: false
+        }
+    ],
+
+})
