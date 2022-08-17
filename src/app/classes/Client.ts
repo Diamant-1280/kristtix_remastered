@@ -61,7 +61,7 @@ export class ExtendedClient extends Client {
         await this.db.connect()
         await this.registerModules()
         await this.login(config.token)
-        // this.меregisterCommands({ commands: this.slashCommands })
+        this.registerCommands({ commands: this.slashCommands })
     }
 
 }
