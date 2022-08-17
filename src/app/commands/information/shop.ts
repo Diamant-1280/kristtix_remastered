@@ -2,7 +2,6 @@ import { client } from "@app/index";
 import { Command } from "@classes/Command";
 import { Guild_Basic, Guild_Interface } from "@interfaces/MongoDB";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, ComponentType, EmbedBuilder, EmbedField } from "discord.js";
-import { config } from "@app/../../config.json"
 
 export default new Command({
     name: "shop",
@@ -31,7 +30,7 @@ export default new Command({
         for (let page = 0; page < pagesCount; page++) {
             pages.push(
                 new EmbedBuilder()
-                    .setColor(config.BaseColor as ColorResolvable)
+                    .setColor('#ffa55a')
                     .setAuthor({ name: "Магазин предметов", iconURL: interaction.guild.iconURL() })
                     .setFields(embedFields.slice(maxElementsOnPage * page, maxElementsOnPage * (page + 1)))
                     .setFooter({ text: `Страница ${page + 1} из ${pagesCount}` })

@@ -1,5 +1,4 @@
 import { HexColorString } from "discord.js"
-import { defaultParameters } from "@app/../../config.json"
 export interface Shop_Item {
      name: string,
      description: string,
@@ -56,8 +55,8 @@ export function User_Basic(user_id: string): User_Interface {
     return {
         userID: user_id,
         rankCard: {
-            color: defaultParameters.rankCard.color as HexColorString,
-            url: defaultParameters.rankCard.url
+            color: "#FEDBC7",
+            url: "https://images8.alphacoders.com/679/679478.jpg"
         }
     }
 }
