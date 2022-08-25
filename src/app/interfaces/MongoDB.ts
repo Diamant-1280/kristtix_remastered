@@ -1,16 +1,16 @@
 import { HexColorString } from "discord.js"
-export interface Shop_Item {
+export interface ShopItem {
      name: string,
      description: string,
      price: number,
-     roleID: string
+     roleID?: string
 }
 
 export interface Guild_Interface {
     _id?: any,
     guildID: string
     blocked_commands: string[],
-    shop: Shop_Item[]
+    shop: ShopItem[]
 }
 
 export function Guild_Basic(id: string): Guild_Interface {

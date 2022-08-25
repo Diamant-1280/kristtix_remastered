@@ -55,7 +55,7 @@ export default new Command({
         const collector: InteractionCollector<SelectMenuInteraction> = interaction.channel.createMessageComponentCollector({
             filter: int => int.customId == `vote_${interaction.id}`,
             componentType: ComponentType.SelectMenu,
-            time: 1000//time * 60 * 1000
+            time: time * 60 * 1000
         })
 
         collector.on('collect', async (int) => {

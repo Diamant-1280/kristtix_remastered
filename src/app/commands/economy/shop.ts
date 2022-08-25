@@ -10,7 +10,7 @@ export default new Command({
     run: async ({ interaction }) => {
         if (!interaction.inCachedGuild()) return
         let currentPage = 1
-        const maxElementsOnPage = 9
+        const maxElementsOnPage = 6
         const shopItems = (await client.db.getOrInsert<Guild_Interface>('guilds', { guildID: interaction.guild.id }, Guild_Basic(interaction.guild.id))).shop
 
         if (!shopItems.length) {
@@ -19,7 +19,7 @@ export default new Command({
         }
 
         const embedFields: EmbedField[] = shopItems.map(item => ({
-            name: "<a:money:840284930563113071>" + item.price + " - " + item.name,
+            name: `${item.name} - <a:money:840284930563113071> ${item.price}`,
             value: item.description,
             inline: true
         }))
@@ -33,7 +33,7 @@ export default new Command({
                     .setColor('#ffa55a')
                     .setAuthor({ name: "Магазин предметов", iconURL: interaction.guild.iconURL() })
                     .setFields(embedFields.slice(maxElementsOnPage * page, maxElementsOnPage * (page + 1)))
-                    .setFooter({ text: `Страница ${page + 1} из ${pagesCount}` })
+                // .setFooter({ text: `Страница ${page + 1} из ${pagesCount}` })
             )
         }
 
@@ -41,6 +41,12 @@ export default new Command({
             .setCustomId('toLeft')
             .setEmoji('<:to_left:873618668582502452>')
             .setStyle(ButtonStyle.Secondary)
+
+        const pageCounterButton = new ButtonBuilder()
+            .setCustomId('counter')
+            .setLabel(`${currentPage} / ${pagesCount}`)
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(true)
 
         const toRigthButton = new ButtonBuilder()
             .setCustomId('toRight')
@@ -56,7 +62,7 @@ export default new Command({
         toRigthButton.setDisabled(currentPage === pagesCount)
 
         const actionRow = new ActionRowBuilder<ButtonBuilder>()
-            .setComponents([toLeftButton, toRigthButton, toCancelButton])
+            .setComponents([toLeftButton, pageCounterButton, toRigthButton, toCancelButton])
 
         const message = await interaction.reply({ embeds: [pages[currentPage - 1]], components: [actionRow], fetchReply: true })
         const collector = message.createMessageComponentCollector({
@@ -75,7 +81,8 @@ export default new Command({
 
             toLeftButton.setDisabled(currentPage === 1)
             toRigthButton.setDisabled(currentPage === pagesCount)
-            actionRow.setComponents([toLeftButton, toRigthButton, toCancelButton])
+            pageCounterButton.setLabel(`${currentPage} / ${pagesCount}`)
+            actionRow.setComponents([toLeftButton, pageCounterButton, toRigthButton, toCancelButton])
 
             interaction.editReply({ embeds: [pages[currentPage - 1]], components: [actionRow] })
         })
@@ -85,10 +92,10 @@ export default new Command({
                 toLeftButton.setDisabled(true)
                 toRigthButton.setDisabled(true)
                 toCancelButton.setDisabled(true)
-                actionRow.setComponents([toLeftButton, toRigthButton, toCancelButton])
+                actionRow.setComponents([toLeftButton, pageCounterButton, toRigthButton, toCancelButton])
 
                 interaction.editReply({ embeds: [pages[currentPage - 1]], components: [actionRow] })
             }
         })
-    }
+    }, dmPermission: false
 })

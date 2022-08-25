@@ -9,12 +9,12 @@ export default new Command({
         name: "user",
         description: "Участник, ранг которого вы хотите посмотреть",
         type: ApplicationCommandOptionType.User,
-        nameLocalizations: { ru: "участник", "en-US": "участник" }
+        nameLocalizations: { ru: "участник" }
     }, {
         name: "hide",
         description: "Укажите, нужно ли отослать результат команды всем в чате",
         type: ApplicationCommandOptionType.Boolean,
-        nameLocalizations: { ru: "скрыть", "en-US": "скрыть"}
+        nameLocalizations: { ru: "скрыть" }
     }],
 
     run: async ({ interaction, client }) => {
@@ -24,14 +24,14 @@ export default new Command({
         await interaction.deferReply({ ephemeral: hide })
 
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
-        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true})
+        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
 
         // данные участника на сервере
         const data = await client.db.getOrInsert<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id }, Guild_User_Basic(user.id, interaction.guildId))
-        const avatar: Image = await loadImage(user.displayAvatarURL({ extension: "png" , size: 512 }))
+        const avatar: Image = await loadImage(user.displayAvatarURL({ extension: "png", size: 512 }))
         const neededExp: number = 5 * Math.pow(data.rating.level, 2) + 50 * data.rating.level + 100
         const progress: number = Math.round(1210 * data.rating.exp / neededExp)
-        
+
         // глоабльаные данные участника
         const global_data = await client.db.getOrInsert<User_Interface>('users', { userID: user.id }, User_Basic(user.id))
         const banner: Image = await loadImage(global_data.rankCard.url)
@@ -39,8 +39,8 @@ export default new Command({
 
         // функция рисования скруленного прямоугольника
         function fillRoundedRect(x: number, y: number, w: number, h: number, r: number) {
-        ctx.beginPath()
-        ctx.moveTo(x + (w / 2), y)
+            ctx.beginPath()
+            ctx.moveTo(x + (w / 2), y)
             ctx.arcTo(x + w, y, x + w, y + (h / 2), r)
             ctx.arcTo(x + w, y + h, x + (w / 2), y + h, r)
             ctx.arcTo(x, y + h, x, y + (h / 2), r)
@@ -57,7 +57,7 @@ export default new Command({
         ctx.drawImage(banner, 0, 0, 1920, 1080)
         ctx.fillStyle = "#55555555"
         ctx.fillRect(0, 620, 1920, 460)
-        
+
         // Рисуем текст
         ctx.fillStyle = '#ffffffff'
         ctx.font = "70px Comfortaa"
@@ -98,5 +98,6 @@ export default new Command({
         const file = canvas.toBuffer()
 
         interaction.editReply({ content: null, files: [file] })
-    }
+    },
+    dmPermission: false
 })

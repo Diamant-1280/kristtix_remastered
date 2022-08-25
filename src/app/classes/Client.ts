@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, Message, AttachmentBuilder } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -43,12 +43,12 @@ export class ExtendedClient extends Client {
             this.slashCommands.push(command)
         })
 
-        // this.on("guildCreate", (guild) => {
-        //     this.registerCommands({
-        //         commands: this.slashCommands,
-        //         guildId: guild.id
-        //     })
-        // })
+        this.on("guildCreate", (guild) => {
+            this.registerCommands({
+                commands: this.slashCommands,
+                guildId: guild.id
+            })
+        })
         
         const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
@@ -61,7 +61,7 @@ export class ExtendedClient extends Client {
         await this.db.connect()
         await this.registerModules()
         await this.login(config.token)
-        this.registerCommands({ commands: this.slashCommands })
+        // this.registerCommands({ commands: this.slashCommands })
     }
 
 }

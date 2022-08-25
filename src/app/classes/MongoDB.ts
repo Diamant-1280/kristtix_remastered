@@ -1,4 +1,4 @@
-import { MongoClient, Filter, Sort, OptionalId, UpdateFilter } from "mongodb";
+import { MongoClient, Filter, Sort, OptionalId, UpdateFilter, MatchKeysAndValues } from "mongodb";
 export default class MongoDB extends MongoClient {
     private readonly dbName = "soleas-DB"
 
@@ -106,11 +106,10 @@ export default class MongoDB extends MongoClient {
     public async updateOne<Schema>(
         collection: string,
         filter: Readonly<Filter<Schema>>,
-        $set: Readonly<UpdateFilter<Schema>>,
+        operator: Readonly<UpdateFilter<Schema>>,
+        // set: Readonly<UpdateFilter<Schema>>,
     ): Promise<Schema> {
-        return (await this.getCollection(collection).updateOne(filter, {
-            $set,
-        })) as unknown as Schema;
+        return (await this.getCollection(collection).updateOne(filter, operator)) as unknown as Schema;
     }
 
     public async updateMany<Schema>(
@@ -124,13 +123,13 @@ export default class MongoDB extends MongoClient {
     }
 
     public async getOrInsert<Schema>(
-		collection: string,
-		filter: Filter<Schema>,
-		data: OptionalId<Schema>
-	): Promise<Schema | OptionalId<Schema>> {
-		const document_ = await this.getOne<Schema>(collection, filter);
-		if (document_) return document_;
-		await this.insertOne<Schema>(collection, data);
-		return data;
-	}
+        collection: string,
+        filter: Filter<Schema>,
+        data: OptionalId<Schema>
+    ): Promise<Schema | OptionalId<Schema>> {
+        const document_ = await this.getOne<Schema>(collection, filter);
+        if (document_) return document_;
+        await this.insertOne<Schema>(collection, data);
+        return data;
+    }
 }
