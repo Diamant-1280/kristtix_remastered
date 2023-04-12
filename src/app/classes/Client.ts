@@ -76,7 +76,7 @@ export class ExtendedClient extends Client {
     }
 
     async start(config: Config): Promise<void> {
-        await this.db.connect()
+        await this.db.connect().then(x => console.log("[DB] MongoDB has been connected"))
         await this.registerModules()
         await this.login(config.token)
         // this.registerCommands({ commands: this.slashCommands })

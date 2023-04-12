@@ -1,6 +1,6 @@
 import { Command } from "@classes/Command";
 import { Guild_User_Interface } from "@interfaces/MongoDB";
-import { errorEmbed } from "@util/replier";
+import { errorEmbed, successEmbed } from "@util/replier";
 import { APIInteractionGuildMember, ApplicationCommandOptionType, GuildMember } from "discord.js";
 export default new Command({
     name: "pay",
@@ -49,13 +49,11 @@ export default new Command({
 
         switch (account) {
             case "cash":
-                if (value > sender.economy.cash) return interaction.reply({
-                    embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ]
-                }); break
+                if (value > sender.economy.cash) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ] })
+                break
             case "bank": 
-                if (value > sender.economy.bank) return interaction.reply({
-                    embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ]
-                }); break
+                if (value > sender.economy.bank) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ] })
+                break
         }
         interaction.reply("passed")
     },

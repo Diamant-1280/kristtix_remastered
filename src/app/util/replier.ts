@@ -1,6 +1,6 @@
-import { APIEmbed, APIInteractionGuildMember, Colors, GuildMember } from "discord.js";
+import { APIEmbed, Colors, EmbedData, GuildMember } from "discord.js";
 
-export function succesEmbed(member: GuildMember, succesMessage: string): APIEmbed {
+export function successEmbed(member: GuildMember, succesMessage: string): APIEmbed {
     return {
         color: Colors.Green,
         author: {
