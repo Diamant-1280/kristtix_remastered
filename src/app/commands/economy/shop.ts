@@ -1,7 +1,7 @@
 import { client } from "@app/index";
 import { Command } from "@classes/Command";
 import { Guild_Basic, Guild_Interface } from "@interfaces/MongoDB";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, ComponentType, EmbedBuilder, EmbedField } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, EmbedField } from "discord.js";
 
 export default new Command({
     name: "shop",
@@ -10,17 +10,14 @@ export default new Command({
     run: async ({ interaction }) => {
         if (!interaction.inCachedGuild()) return
         let currentPage = 1
-        const maxElementsOnPage = 6
+        const maxElementsOnPage = 1
         const shopItems = (await client.db.getOrInsert<Guild_Interface>('guilds', { guildID: interaction.guild.id }, Guild_Basic(interaction.guild.id))).shop
 
-        if (!shopItems.length) {
-            interaction.reply("Магазин пуст, нет предметов для покупки!")
-            return
-        }
+        if (!shopItems.length) return interaction.reply("Магазин пуст, нет предметов для покупки!")
 
         const embedFields: EmbedField[] = shopItems.map(item => ({
             name: `${item.name} - <a:money:840284930563113071> ${item.price}`,
-            value: item.description,
+            value: item.description || "Описание не указано",
             inline: true
         }))
 
@@ -83,17 +80,15 @@ export default new Command({
             toRigthButton.setDisabled(currentPage === pagesCount)
             pageCounterButton.setLabel(`${currentPage} / ${pagesCount}`)
             actionRow.setComponents([toLeftButton, pageCounterButton, toRigthButton, toCancelButton])
-
             interaction.editReply({ embeds: [pages[currentPage - 1]], components: [actionRow] })
         })
 
-        collector.on('end', (int, reason) => {
+        collector.on('end', (_int, reason) => {
             if (reason != 'cancel') {
                 toLeftButton.setDisabled(true)
                 toRigthButton.setDisabled(true)
                 toCancelButton.setDisabled(true)
                 actionRow.setComponents([toLeftButton, pageCounterButton, toRigthButton, toCancelButton])
-
                 interaction.editReply({ embeds: [pages[currentPage - 1]], components: [actionRow] })
             }
         })

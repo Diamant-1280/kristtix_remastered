@@ -19,7 +19,7 @@ export default new Event('messageCreate', async (message) => {
         return [res, data]
     }
 
-    async function rating_update(message: Message, [data, res]: [Guild_User_Interface, Guild_Interface]): Promise<void> {
+    async function rating_update(message: Message, [data]: [Guild_User_Interface, Guild_Interface]): Promise<void> {
         if (client.talkedRecently.has(message.author.id)) return
         const { db } = client
         const givenExp: number = Math.floor(Math.random() * 11) + 15

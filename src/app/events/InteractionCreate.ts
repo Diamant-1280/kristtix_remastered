@@ -1,7 +1,6 @@
 import { client } from "@app/index"
 import { Event } from "@classes/Event"
 import { CommandType, ExtendedInteraction } from "@interfaces/Commands"
-import { CommandInteractionOptionResolver, Message } from "discord.js"
 export default new Event('interactionCreate', async (interaction) => {
     if (!interaction.inCachedGuild()) {
         if (interaction.isCommand()) interaction.reply("Простите, что вы пытаетесь сделать!?")
@@ -18,16 +17,7 @@ export default new Event('interactionCreate', async (interaction) => {
         })
     }
 
-    if (interaction.isButton()) {
-        const givenInfo: string[] = interaction.customId.split("_")
-        if (interaction.customId.startsWith("del_")) {
-            if (interaction.member.id != givenInfo.at(1)) return interaction.reply({
-                ephemeral: true,
-                content: "Вы не можете удалить это сообщение, оно вам не принадлежит!"
-            })
-
-            if (givenInfo.at(2)) interaction.channel.messages.cache.get(givenInfo.at(2))?.delete()
-            interaction.message.delete()
-        }
+    if (!interaction.isButton) {
+        
     }
 })

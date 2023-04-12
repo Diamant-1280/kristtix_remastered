@@ -8,16 +8,34 @@ import MongoDB from '@classes/MongoDB'
 import glob from 'glob'
 const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
+    constructor() {
+        super({
+            intents: ['Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent']
+        })
+    }
+
+    public check = async (collection: string) => {
+        if (!collection) return "Oops! Missing collection name!"
+        const obj = await this.db.getMany(collection)
+        return JSON.stringify(obj, null, 2)
+    }
+
+    public set_commands = (guildID: string) => {
+        if (!guildID) return "Oops! Missing guildID!"
+        const guild = this.guilds.cache.get(guildID)
+        if (!guild) return "Oops! Guild not found!"
+        this.registerCommands({
+            commands: this.slashCommands,
+            guildId: guild.id
+        })
+        return `Succesful registering commands to ${guild.name} | ${guild.id}`
+    }
+
     public talkedRecently: Set<String> = new Set()
     public slashCommands: ApplicationCommandDataResolvable[] = []
     public commands: Collection<string, CommandType> = new Collection()
     public owners: string[] = ["516654639480045588"]
     public db: MongoDB = new MongoDB(process.env.MONGODB_URL)
-    constructor() {
-        super({
-            intents: [ 'Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent' ]
-        })
-    }
 
     async importFile(filePath: string) {
         return (await import(filePath))?.default
@@ -49,14 +67,14 @@ export class ExtendedClient extends Client {
                 guildId: guild.id
             })
         })
-        
+
         const eventFiles: string[] = await globPromise(`${__dirname}/../events/*{.ts,.js}`)
         eventFiles.forEach(async filePath => {
             const event: Event<keyof ClientEvents> = await this.importFile(filePath)
             this.on(event.event, event.run)
         })
     }
-    
+
     async start(config: Config): Promise<void> {
         await this.db.connect()
         await this.registerModules()

@@ -7,9 +7,9 @@ export const client = new ExtendedClient()
 client.start(process.env as Config)
 
 try {
-    registerFont(path.join(__dirname, "./../../Comfortaa-Bold.ttf"), { family: "Comfortaa" })
+    registerFont(path.join(__dirname, "./../../Comfortaa-Bold.ttf"), { family: "Comfortaa", style: "Bold" })
 } catch (e) { }
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
     console.log(reason)
 })

@@ -1,4 +1,4 @@
-import { MongoClient, Filter, Sort, OptionalId, UpdateFilter, MatchKeysAndValues } from "mongodb";
+import { MongoClient, Filter, Sort, OptionalId, UpdateFilter } from "mongodb";
 export default class MongoDB extends MongoClient {
     private readonly dbName = "soleas-DB"
 

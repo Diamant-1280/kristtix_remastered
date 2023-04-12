@@ -56,51 +56,51 @@ export default new Command({
         const itemRole = interaction.options.getRole("role")
 
         const shop = (await client.db.getOne<Guild_Interface>('guilds', { guildID: interaction.guildId })).shop
-        const item = shop.find(item => item.name == itemName)
+        const oldItem = shop.find(item => item.name == itemName)
 
-        const newItem: ShopItem = {
-            name: newItemName || itemName,
-            description: itemDescription || item?.description || null,
-            price: (itemPrice == 0) ? 0 : itemPrice || item?.price || 0,
-            roleID: itemRole?.id || item?.roleID || null
-        }
+        const item: ShopItem = {
+            name: newItemName || itemName, // новое имя, или имя которое уже есть
+            description: itemDescription || oldItem?.description || null, // новое описание или описание существующего предмета если не указано, или ничего
+            price: (itemPrice == 0) ? 0 : itemPrice || oldItem?.price || 0, // если новая цена ноль - ноль, если другая - то другая, если нет другой то ноль
+            roleID: itemRole?.id || oldItem?.roleID || null //новая роль, если нет, то старая роль, иначе оставить пустым
+        }   
 
-        console.log(newItem)
+        const regExp = /[^А-ЯЁа-яё\s\d\w-.]/gi
+        if (item.name.match(regExp)?.length) return interaction.reply({ content: "Ошибка названия, найдены недопустимые символы!\nДопустимы только буквы и символы: \`[А-Я]\`, \`[A-Z]\`, \`[0-9]\`, \`.\` , \`_\` , \`-\`\nВ вашем названии использованы запрещенные: " + `\`${item.name.match(regExp).join("\` , \`")}\``, ephemeral: true })
 
         const embed = new EmbedBuilder()
             .setColor("#ffa55a")
             .setTitle("Информация о предмете")
             .addFields([
-                { name: "Название", value: `${newItem.name}`, inline: true },
-                { name: "Цена", value: `<a:money:840284930563113071> ${newItem.price}`, inline: true },
-                { name: "Описание", value: (newItem.description) ? `${newItem.description}` : "Описание не задано", inline: !newItem.description },
-                { name: "Роль", value: (newItem.roleID) ? `<@&${newItem.roleID}>` : "Роль не указана", inline: true }
+                { name: "Название", value: `${item.name}`, inline: true },
+                { name: "Цена", value: `<a:money:840284930563113071> ${item.price}`, inline: true },
+                { name: "Описание", value: (item.description) ? `${item.description}` : "Описание не задано", inline: !item.description },
+                { name: "Роль", value: (item.roleID) ? `<@&${item.roleID}>` : "Роль не указана", inline: true }
             ])
 
         switch (subCommand) {
             case "add": {
-                if (item) return interaction.reply({ content: "Данный предмет уже существует!", ephemeral: true })
-                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $push: { shop: newItem } })
+                if (oldItem) return interaction.reply({ content: "Данный предмет уже существует!", ephemeral: true })
+                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $push: { shop: item } })
                 interaction.reply({ content: "Предмет успешно добавлен!", embeds: [embed], ephemeral: true })
                 break
             }
             case "info": {
-                if (!item) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
+                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
                 interaction.reply({ embeds: [embed], ephemeral: true })
                 break
             }
             case "edit": {
-                if (!item) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
-                if (JSON.stringify(item) == JSON.stringify(newItem)) return interaction.reply("Вы не указали никаких изменений!")
-                // if (!itemDescription && !itemRole ) return interaction.reply("Вы не указали ни одного аргумента который следовало бы изменить!")
-                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId, "shop.name": itemName }, { $set: { "shop.$": newItem } })
+                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
+                if (JSON.stringify(item) == JSON.stringify(item)) return interaction.reply("Вы не указали никаких изменений!")
+                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId, "shop.name": itemName }, { $set: { "shop.$": item } })
                 interaction.reply({ content: "Предмет успешно изменён!", embeds: [embed], ephemeral: true })
                 break
             }
             case "remove": {
-                if (!item) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
-                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $pull: { shop: { name: itemName } } })
-                interaction.reply({ content: `Предмет \`${newItem.name}\` успешно удалён!`, ephemeral: true })
+                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
+                await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $pull: { shop: { name: item.name } } })
+                interaction.reply({ content: `Предмет \`${item.name}\` успешно удалён!`, ephemeral: true })
                 break
             }
         }

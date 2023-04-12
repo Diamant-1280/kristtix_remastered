@@ -23,6 +23,9 @@ export default new Command({
         const hide: boolean = interaction.options.getBoolean('hide', false) || false
         await interaction.deferReply({ ephemeral: hide })
 
+        if (!user?.id) return interaction.followUp({ content: "Пользователь не найден!" })
+        if (!interaction.guild.members.cache.get(user.id)) return interaction.followUp({ content: "Пользователь не найден!" })
+
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
 
@@ -60,9 +63,9 @@ export default new Command({
 
         // Рисуем текст
         ctx.fillStyle = '#ffffffff'
-        ctx.font = "70px Comfortaa"
+        ctx.font = "70px Comfortaa Bold"
         ctx.fillText(member.displayName, 640, 763)
-        ctx.font = "80px Comfortaa"
+        ctx.font = "80px Comfortaa Bold"
         ctx.fillText(`lv. ${data.rating.level}`, 640, 915)
         ctx.fillText(`${data.rating.exp} / ${neededExp} exp`, (1920 - 70) - ctx.measureText(`${data.rating.exp} / ${neededExp} exp`).width, 915)
 

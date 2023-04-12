@@ -1,7 +1,7 @@
 import { Event } from "@classes/Event"
 import Eval from "@util/eval"
 import { client } from "@app/index"
-export default new Event('messageUpdate', (oldMessage, newMessage) => {
+export default new Event('messageUpdate', (_, newMessage) => {
     if (!newMessage || newMessage.author.bot) return
     if (
         newMessage.content.startsWith('```js')

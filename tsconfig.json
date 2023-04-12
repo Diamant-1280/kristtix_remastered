@@ -13,6 +13,7 @@
         "module": "CommonJS",
         "esModuleInterop": true,
         "lib": [
+            "ES2021",
             "es2020",
             "dom",
             "es5",

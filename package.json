@@ -1,6 +1,6 @@
 {
   "name": "kristtix_remastered",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "hello world!",
   "main": "index.js",
   "scripts": {
@@ -24,10 +24,9 @@
   "author": "Diamant",
   "license": "MIT",
   "dependencies": {
-    "all": "^0.0.0",
-    "canvas": "^2.9.0",
-    "discord.js": "^14.1.2",
-    "dotenv": "^16.0.0",
+    "canvas": "^2.11.2",
+    "discord.js": "^14.9.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.3",
     "glob": "^7.2.0",
     "module-alias": "^2.2.2",

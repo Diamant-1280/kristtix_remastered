@@ -1,12 +1,10 @@
 import { Shard, ShardingManager } from 'discord.js'
 import { config } from 'dotenv'
 import path from 'path'
-// import API from './api/server'
 
 config()
 
 export class Manager extends ShardingManager {
-	// public api!: API;
 	public constructor() {
 		super(path.join(__dirname, 'app/index.js'), {
 			totalShards: 1,
@@ -28,9 +26,7 @@ export class Manager extends ShardingManager {
 				console.log(`[SHARDS] Shard ${shard.id} is dead`)
 			})
 		})
-		this.spawn({ amount: this.totalShards }).then(() => {
-			// this.api = new API(this)
-		})
+		this.spawn({ amount: this.totalShards })
 	}
 }
 

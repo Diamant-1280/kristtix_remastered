@@ -1,5 +1,4 @@
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Message } from "discord.js";
-import { client } from "@app/index"
 export default async function Eval(message: Message): Promise<void> {
     const evalActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
@@ -11,15 +10,6 @@ export default async function Eval(message: Message): Promise<void> {
         )
 
     const args: string[] = message.content.slice(5, message.content.length - 3).trim().split(" ")
-
-    if (args.at(0) == "set") {
-        message.reply("Устанавливаю команды для сервера!")
-        client.registerCommands({
-            commands: client.slashCommands,
-            guildId: message.guild.id
-        })
-        return
-    }
 
     const code: string = args.join(" ")
     async function clean(code: string): Promise<string> {
@@ -37,6 +27,6 @@ export default async function Eval(message: Message): Promise<void> {
         const file: AttachmentBuilder[] = cleaned.length > 2000 ? [new AttachmentBuilder(Buffer.from(`${cleaned}`), { name: "Код дебила.js" })] : [];
         await message.reply({ content: `\`\`\`js\n${text}\n\`\`\``, files: file, components: [evalActionRow] })
     } catch (err) {
-        message.channel.send({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\``, components: [evalActionRow] })
+        message.reply({ content: `\`ERROR\`\n\`\`\`x1\n${err}\n\`\`\``, components: [evalActionRow] })
     }
 }
