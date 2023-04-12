@@ -3,7 +3,7 @@ import { Guild_Interface, Guild_User_Basic, Guild_User_Interface } from "@interf
 
 export default new Command({
     name: "work",
-    nameLocalizations: { "ru": "подработка" },
+    nameLocalizations: { "ru": "работа" },
     description: "Получите немного денег раз в 5 часов",
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return

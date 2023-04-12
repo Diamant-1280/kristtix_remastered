@@ -3,7 +3,7 @@ import { Guild_Interface, Guild_User_Interface } from "@interfaces/MongoDB";
 import { ApplicationCommandOptionType } from "discord.js";
 export default new Command({
     name: "crime",
-    nameLocalizations: { ru: "кража" },
+    nameLocalizations: { ru: "воровство" },
     description: "Попытейтесь украсть у пользователя деньги!",
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return
@@ -19,7 +19,7 @@ export default new Command({
 
         const res: Guild_Interface = await client.db.getOne<Guild_Interface>('guilds', { guildID: interaction.guildId })
 
-        if (cash > 800) return
+        if (cash > 500) return
         if (victim.economy.cash < cash) return interaction.reply(`Вы не можете украсть у пользователя больше, чем у него есть!`)
         if (victim.userID == thief.userID) return interaction.reply('Вы не можете украсть у самого себя!')
 
@@ -57,7 +57,7 @@ export default new Command({
         description: "Укажите количество денег, которое вы хотите украсть",
         type: ApplicationCommandOptionType.Integer,
         minValue: 30,
-        maxValue: 800,
+        maxValue: 500,
         required: true
     }],
     dmPermission: false
