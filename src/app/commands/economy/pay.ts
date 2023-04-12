@@ -38,7 +38,7 @@ export default new Command({
     }],
 
     run: async ({ interaction, client }) => {
-        interaction.member
+        if (!interaction.inCachedGuild()) return
         const user = interaction.options.getUser("user")
         const value = interaction.options.getInteger('value')
         const account = interaction.options.getString('account')
@@ -50,15 +50,14 @@ export default new Command({
         switch (account) {
             case "cash":
                 if (value > sender.economy.cash) return interaction.reply({
-                    embeds: [ errorEmbed(interaction.member as APIInteractionGuildMember, "У вас недостаточно средств!") ]
+                    embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ]
                 }); break
             case "bank": 
                 if (value > sender.economy.bank) return interaction.reply({
-                    embeds: [ errorEmbed(interaction.member as APIInteractionGuildMember, "У вас недостаточно средств!") ]
+                    embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ]
                 }); break
         }
         interaction.reply("passed")
-
     },
     dmPermission: false,
 })

@@ -1,23 +1,23 @@
 import { APIEmbed, APIInteractionGuildMember, Colors, GuildMember } from "discord.js";
 
-export function succesEmbed(member: APIInteractionGuildMember, succesMessage: string): APIEmbed {
+export function succesEmbed(member: GuildMember, succesMessage: string): APIEmbed {
     return {
         color: Colors.Green,
         author: {
-            name: member.nick || member.user.username,
-            icon_url: member.avatar
+            name: member.displayName,
+            icon_url: member.displayAvatarURL()
         },
         description: succesMessage
     }
 }
 
-export function errorEmbed(member: APIInteractionGuildMember, errorMessage: string): APIEmbed {
+export function errorEmbed(member: GuildMember, errorMessage: string): APIEmbed {
     return {
         color: Colors.Red,
         title: "Ошибка",
         author: {
-            name: member.nick || member.user.username,
-            icon_url: member.avatar
+            name: member.displayName,
+            icon_url: member.displayAvatarURL()
         },
         description: errorMessage
     }
