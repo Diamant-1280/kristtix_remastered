@@ -2,10 +2,7 @@ import { client } from "@app/index"
 import { Event } from "@classes/Event"
 import { CommandType, ExtendedInteraction } from "@interfaces/Commands"
 export default new Event('interactionCreate', async (interaction) => {
-    if (!interaction.inCachedGuild()) {
-        if (interaction.isCommand()) interaction.reply("Простите, что вы пытаетесь сделать!?")
-        return
-    }
+    if (!interaction.inCachedGuild()) return
 
     if (interaction.isCommand()) {
         const command: CommandType = client.commands.get(interaction.commandName)
@@ -16,8 +13,17 @@ export default new Event('interactionCreate', async (interaction) => {
             interaction: interaction as ExtendedInteraction
         })
     }
-
-    if (!interaction.isButton) {
-        
+    // del_<автор>_<прикрепленное-сообщение>
+    if (interaction.isButton()) {
+        const givenInfo: string[] = interaction.customId.split("_") 
+        if (interaction.customId.startsWith("del_")) { 
+            if (interaction.user.id != givenInfo.at(1)) return interaction.reply({
+                ephemeral: true,
+                content: "Вы не можете удалить это сообщение, оно вам не пренадлежит!"
+            })
+            const msg = interaction.channel.messages.cache.get(givenInfo.at(2))
+            msg?.delete()
+            interaction.message.delete()
+        }
     }
 })
