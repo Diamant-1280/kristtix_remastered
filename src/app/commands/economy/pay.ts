@@ -39,27 +39,36 @@ export default new Command({
 
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return
+        const member = interaction.member
         const user = interaction.options.getUser("user")
         const value = interaction.options.getInteger('value')
         const account = interaction.options.getString('account')
         const sender = await client.db.getOne<Guild_User_Interface>("guild-users", { guildID: interaction.guildId, userID: interaction.user.id })
 
-        if (!interaction.options.getMember("user")) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "Пользователь не найден!") ] })
-        if (user.id == interaction.member.user.id) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "Вы не можете перевести деньги самому себе!!") ] })
+        if (!interaction.options.getMember("user")) return interaction.reply({ embeds: [errorEmbed(interaction.member, "Пользователь не найден!")] })
+        if (user.id == interaction.member.user.id) return interaction.reply({ embeds: [errorEmbed(interaction.member, "Вы не можете перевести деньги самому себе!!")] })
 
         switch (account) {
             case "cash":
-                if (value > sender.economy.cash) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств наличными") ] })
+                if (value > sender.economy.cash) return interaction.reply({ embeds: [errorEmbed(interaction.member, "У вас недостаточно средств наличными")] })
                 sender.economy.cash -= value
                 break
-            case "bank": 
-                if (value > sender.economy.bank) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств в банке") ] })
+            case "bank":
+                if (value > sender.economy.bank) return interaction.reply({ embeds: [errorEmbed(interaction.member, "У вас недостаточно средств в банке")] })
                 sender.economy.bank -= value
                 break
         }
 
-        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "": value}})
-        interaction.reply("passed")
+        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "economy.bank": value } })
+        interaction.reply({
+            embeds: [{
+                author: {
+                    name: member.displayName,
+                    icon_url: member.displayAvatarURL()
+                },
+                
+            }]
+        })
     },
     dmPermission: false,
 })
