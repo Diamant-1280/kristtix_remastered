@@ -44,17 +44,21 @@ export default new Command({
         const account = interaction.options.getString('account')
         const sender = await client.db.getOne<Guild_User_Interface>("guild-users", { guildID: interaction.guildId, userID: interaction.user.id })
 
-        if (!interaction.options.getMember("user")) return interaction.reply("Ошибка, пользователь не найден!")
-        if (user.id == interaction.member.user.id) return interaction.reply
+        if (!interaction.options.getMember("user")) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "Пользователь не найден!") ] })
+        if (user.id == interaction.member.user.id) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "Вы не можете перевести деньги самому себе!!") ] })
 
         switch (account) {
             case "cash":
-                if (value > sender.economy.cash) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ] })
+                if (value > sender.economy.cash) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств наличными") ] })
+                sender.economy.cash -= value
                 break
             case "bank": 
-                if (value > sender.economy.bank) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств!") ] })
+                if (value > sender.economy.bank) return interaction.reply({ embeds: [ errorEmbed(interaction.member, "У вас недостаточно средств в банке") ] })
+                sender.economy.bank -= value
                 break
         }
+
+        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "": value}})
         interaction.reply("passed")
     },
     dmPermission: false,
