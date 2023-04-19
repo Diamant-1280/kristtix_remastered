@@ -7,7 +7,7 @@ export default new Command({
     description: "Получите немного денег раз в 5 часов",
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return
-        const data: Guild_User_Interface = await client.db.getOrInsert<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: interaction.user.id }, Guild_User_Basic(interaction.member.id, interaction.guild.id))
+        const data: Guild_User_Interface = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: interaction.user.id })
 
         const remainingTime = new Date(data.cooldowns.work - Date.now())
         if (data.cooldowns.work > Date.now())

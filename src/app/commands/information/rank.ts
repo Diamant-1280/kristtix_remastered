@@ -23,14 +23,13 @@ export default new Command({
         const hide: boolean = interaction.options.getBoolean('hide', false) || false
         await interaction.deferReply({ ephemeral: hide })
 
-        if (!user?.id) return interaction.followUp({ content: "Пользователь не найден!" })
-        if (!interaction.guild.members.cache.get(user.id)) return interaction.followUp({ content: "Пользователь не найден!" })
+        if (!user?.id || !interaction.guild.members.cache.get(user.id)) return interaction.followUp({ content: "Пользователь не найден!" })
 
         const member: GuildMember = interaction.guild.members.cache.get(user.id)
         if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
 
         // данные участника на сервере
-        const data = await client.db.getOrInsert<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id }, Guild_User_Basic(user.id, interaction.guildId))
+        const data = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id })
         const avatar: Image = await loadImage(user.displayAvatarURL({ extension: "png", size: 512 }))
         const neededExp: number = 5 * Math.pow(data.rating.level, 2) + 50 * data.rating.level + 100
         const progress: number = Math.round(1210 * data.rating.exp / neededExp)

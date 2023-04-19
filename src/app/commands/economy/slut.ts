@@ -15,7 +15,7 @@ export default new Command({
 
         const res: Guild_Interface = await client.db.getOne<Guild_Interface>('guilds', { guildID: interaction.guildId })
         const cash = Math.floor(Math.random() * 400 ) + 300
-        const message = res.messages.slut.success[Math.floor(Math.random() * res.messages.slut.success.length )] || "Вы получили <cash>"
+        const message = res.messages.slut[Math.floor(Math.random() * res.messages.slut.length )] || "Вы получили <cash>"
         const cashRegExp = /\${cash}|{cash}|<cash>|\${money}|{money}|<money>/ig
         
         interaction.reply(message.replaceAll(cashRegExp, `**<a:money:840284930563113071> ${cash}**`))

@@ -1,7 +1,7 @@
 import { Command } from "@classes/Command";
-import { Guild_User_Basic, Guild_User_Interface } from "@interfaces/MongoDB";
-import { errorEmbed, successEmbed } from "@util/replier";
-import { APIInteractionGuildMember, ApplicationCommandOptionType, GuildMember } from "discord.js";
+import { Guild_User_Interface } from "@interfaces/MongoDB";
+import { errorEmbed } from "@util/replier";
+import { ApplicationCommandOptionType } from "discord.js";
 export default new Command({
     name: "pay",
     description: "Перевод средств с вашего баланса другому участнику",
@@ -47,10 +47,7 @@ export default new Command({
                 timestamp: interaction.createdAt.toISOString()
             }]
         })
-        // запись получателя и зачисление
-        await client.db.getOrInsert<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id}, Guild_User_Basic(user.id, interaction.guildId))
         client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "economy.bank": value } })
-        // вычисление у отправителя
         client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id}, { $inc: { "economy.bank": -value } })
     },
     dmPermission: false,

@@ -12,9 +12,7 @@ export interface Guild_Interface {
     shop: ShopItem[],
     messages: {
         work: string[],
-        slut: {
-            success: string[]
-        },
+        slut: string[],
         crime: {
             success: string[],
             fail: string[]
@@ -31,12 +29,10 @@ export function Guild_Basic(id: string): Guild_Interface {
                 "Вы работали день и ночь и получили ${cash}!",
                 "Вы подработали и получили ${cash}!"
             ],
-            slut: {
-                success: [
-                    "Вы трахались пол часа и получили от проститутки ${cash}",
-                    "Вы торговали жопой на обочине и получили ${cash}"
-                ]
-            },
+            slut: [
+                "Вы трахались пол часа и получили от проститутки ${cash}",
+                "Вы торговали жопой на обочине и получили ${cash}"
+            ],
             crime: {
                 success: [
                     "Вы украли ${cash} у ${user}",
