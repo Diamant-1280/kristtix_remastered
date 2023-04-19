@@ -99,7 +99,7 @@ export default new Command({
         ctx.drawImage(avatar, 50, 530, 500, 500)
         const file = canvas.toBuffer()
 
-        interaction.editReply({ content: null, files: [file] })
+        interaction.followUp({ content: null, files: [file] })
     },
     dmPermission: false
 })

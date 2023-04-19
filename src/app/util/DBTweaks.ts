@@ -6,7 +6,7 @@ export async function RatingPos(guild: Guild, member: GuildMember) {
     const user = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: guild.id, userID: member.id })
     const users = await client.db.getMany<Guild_User_Interface>('guild-users', { guildID: guild.id })
     const sortedUsers = users.sort((A, B) => (A.rating.level > B.rating.level) ? 1 : (A.rating.level != B.rating.level) ? 1 : (A.rating.exp > B.rating.exp) ? 1 : -1)
-    return sortedUsers.indexOf(user)
+    return sortedUsers.findIndex(x => x.userID == user.userID)
 }
 
 export async function SetGuildMember(member: GuildMember) {
