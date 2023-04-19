@@ -1,5 +1,5 @@
 import { Command } from "@classes/Command";
-import { Guild_User_Interface } from "@interfaces/MongoDB";
+import { Guild_User_Basic, Guild_User_Interface } from "@interfaces/MongoDB";
 import { errorEmbed, successEmbed } from "@util/replier";
 import { APIInteractionGuildMember, ApplicationCommandOptionType, GuildMember } from "discord.js";
 export default new Command({
@@ -20,21 +20,6 @@ export default new Command({
         minValue: 50,
         maxValue: 5000,
         required: true
-    }, {
-        name: "account",
-        nameLocalizations: { ru: "счет" },
-        description: "Выберите, перевести наличными или из банка?",
-        type: ApplicationCommandOptionType.String,
-        choices: [{
-            name: "cash",
-            nameLocalizations: { ru: "наличные" },
-            value: "cash"
-        }, {
-            name: "bank",
-            nameLocalizations: { ru: "банк" },
-            value: "bank"
-        }],
-        required: true
     }],
 
     run: async ({ interaction, client }) => {
@@ -42,33 +27,31 @@ export default new Command({
         const member = interaction.member
         const user = interaction.options.getUser("user")
         const value = interaction.options.getInteger('value')
-        const account = interaction.options.getString('account')
-        const sender = await client.db.getOne<Guild_User_Interface>("guild-users", { guildID: interaction.guildId, userID: interaction.user.id })
+        const sender = await client.db.getOne<Guild_User_Interface>("guild-users", { guildID: interaction.guildId, userID: member.id })
+        
+        if (!interaction.options.getMember("user")) return interaction.reply({ embeds: errorEmbed("Пользователь не найден!") })
+        if (user.id == member.id) return interaction.reply({ embeds: errorEmbed("Вы не можете перевести деньги самому себе!") })
+        if (sender.economy.cash - value < 0) return interaction.reply({ embeds: errorEmbed("У вас недостаточно средств!") })
+        if (user.bot) return interaction.reply({ embeds: errorEmbed("Вы не можете перевести деньги боту!") })
 
-        if (!interaction.options.getMember("user")) return interaction.reply({ embeds: [errorEmbed(interaction.member, "Пользователь не найден!")] })
-        if (user.id == interaction.member.user.id) return interaction.reply({ embeds: [errorEmbed(interaction.member, "Вы не можете перевести деньги самому себе!!")] })
-
-        switch (account) {
-            case "cash":
-                if (value > sender.economy.cash) return interaction.reply({ embeds: [errorEmbed(interaction.member, "У вас недостаточно средств наличными")] })
-                sender.economy.cash -= value
-                break
-            case "bank":
-                if (value > sender.economy.bank) return interaction.reply({ embeds: [errorEmbed(interaction.member, "У вас недостаточно средств в банке")] })
-                sender.economy.bank -= value
-                break
-        }
-
-        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "economy.bank": value } })
         interaction.reply({
             embeds: [{
-                author: {
-                    name: member.displayName,
-                    icon_url: member.displayAvatarURL()
-                },
-                
+                // author: { name: member.displayName, icon_url: member.displayAvatarURL() },
+                title: "Перевод",
+                fields: [
+                    { name: "Отправитель", value: `<@!${member.id}>`, inline: true },
+                    { name: "Получитель", value: `<@!${user.id}>`, inline: true },
+                    { name: "Сумма", value: `**<a:money:840284930563113071> ${value}**`, inline: true },
+                ],
+                color: 0xffa55a,
+                timestamp: interaction.createdAt.toISOString()
             }]
         })
+        // запись получателя и зачисление
+        await client.db.getOrInsert<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id}, Guild_User_Basic(user.id, interaction.guildId))
+        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "economy.bank": value } })
+        // вычисление у отправителя
+        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id}, { $inc: { "economy.bank": -value } })
     },
     dmPermission: false,
 })
