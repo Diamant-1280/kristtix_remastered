@@ -10,7 +10,7 @@ const globPromise = promisify(glob)
 export class ExtendedClient extends Client {
     constructor() {
         super({
-            intents: ['Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent']
+            intents: ['Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent', 'GuildPresences']
         })
     }
 

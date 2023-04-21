@@ -1,5 +1,6 @@
 import { Command } from "@classes/Command";
 import { Guild_Interface, Guild_User_Interface } from "@interfaces/MongoDB";
+import { errorEmbed } from "@util/replier";
 import { ApplicationCommandOptionType } from "discord.js";
 export default new Command({
     name: "crime",
@@ -9,19 +10,21 @@ export default new Command({
         if (!interaction.inCachedGuild()) return
         const member = interaction.options.getMember("user"),
             cash = interaction.options.getInteger('count')
+        
+        if (!member) return interaction.reply({ embeds: errorEmbed('Пользователь не найден') })
 
         const thief: Guild_User_Interface = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: interaction.user.id })
         const victim: Guild_User_Interface = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.user.id })
 
         const remainingTime: Date = new Date(thief.cooldowns.crime - Date.now())
         if (thief.cooldowns.crime > Date.now())
-            return interaction.reply(`Повторное использование команды через **${remainingTime.getHours() - 4}ч ${remainingTime.getMinutes()}мин ${remainingTime.getSeconds()}сек**`)
+            return interaction.reply({ embeds: errorEmbed(`Повторное использование команды через **${remainingTime.getHours() - 4}ч ${remainingTime.getMinutes()}мин ${remainingTime.getSeconds()}сек**`) })
 
         const res: Guild_Interface = await client.db.getOne<Guild_Interface>('guilds', { guildID: interaction.guildId })
 
         if (cash > 500) return
-        if (victim.economy.cash < cash) return interaction.reply(`Вы не можете украсть у пользователя больше, чем у него есть!`)
-        if (victim.userID == thief.userID) return interaction.reply('Вы не можете украсть у самого себя!')
+        if (victim.economy.cash < cash) return interaction.reply({ embeds: errorEmbed('Вы не можете украсть у пользователя больше, чем у него есть!') })
+        if (victim.userID == thief.userID) return interaction.reply({ embeds: errorEmbed('Вы не можете украсть у самого себя!') })
 
         const cashRegExp = /\${cash}|{cash}|<cash>|\${money}|{money}|<money>/ig,
             userRegExp = /\${user}|{user}|<user>/ig
@@ -48,13 +51,13 @@ export default new Command({
     options: [{
         name: "user",
         nameLocalizations: { ru: "участник" },
-        description: "Укажите участника, у которого хотите украсть деньги",
+        description: "Целевой участник",
         type: ApplicationCommandOptionType.User,
         required: true
     }, {
         name: "count",
         nameLocalizations: { ru: "сумма" },
-        description: "Укажите количество денег, которое вы хотите украсть",
+        description: "Целевая сумма кражи",
         type: ApplicationCommandOptionType.Integer,
         minValue: 30,
         maxValue: 500,

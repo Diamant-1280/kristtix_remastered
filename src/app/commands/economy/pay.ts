@@ -9,13 +9,13 @@ export default new Command({
     options: [{
         name: "user",
         nameLocalizations: { ru: "участник" },
-        description: "Укажите участника для перевода",
+        description: "Целевой участник",
         type: ApplicationCommandOptionType.User,
         required: true
     }, {
         name: "value",
         nameLocalizations: { ru: "сумма" },
-        description: "Укажите сумму для перевода",
+        description: "Сумма для перевода",
         type: ApplicationCommandOptionType.Integer,
         minValue: 50,
         maxValue: 5000,
@@ -48,7 +48,7 @@ export default new Command({
             }]
         })
         client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: user.id }, { $inc: { "economy.bank": value } })
-        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id}, { $inc: { "economy.bank": -value } })
+        client.db.updateOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id}, { $inc: { "economy.cash": -value } })
     },
     dmPermission: false,
 })

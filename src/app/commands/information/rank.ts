@@ -2,6 +2,8 @@ import { Command } from "@classes/Command";
 import { ApplicationCommandOptionType, GuildMember, HexColorString, User } from "discord.js";
 import { Canvas, createCanvas, loadImage, CanvasRenderingContext2D, Image } from 'canvas'
 import { User_Basic, User_Interface, Guild_User_Basic, Guild_User_Interface } from "@interfaces/MongoDB";
+import { RatingPositions } from "@util/DBTweaks";
+import { errorEmbed } from "@util/replier";
 export default new Command({
     name: "ранг",
     description: "Показывает карточку ранга выбранного участника (или у вас)",
@@ -19,25 +21,24 @@ export default new Command({
 
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return
-        const user: User = interaction.options.getUser('user', false) || interaction.user
+        const member: GuildMember = interaction.options.getMember('user') || interaction.member
         const hide: boolean = interaction.options.getBoolean('hide', false) || false
         await interaction.deferReply({ ephemeral: hide })
 
-        if (!user?.id || !interaction.guild.members.cache.get(user.id)) return interaction.followUp({ content: "Пользователь не найден!" })
-
-        const member: GuildMember = interaction.guild.members.cache.get(user.id)
-        if (user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
+        if (member?.user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
 
         // данные участника на сервере
-        const data = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id })
-        const avatar: Image = await loadImage(user.displayAvatarURL({ extension: "png", size: 512 }))
+        const data = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guild.id, userID: member.id })
+        const avatar: Image = await loadImage(member.user.displayAvatarURL({ extension: "png", size: 512 }))
         const neededExp: number = 5 * Math.pow(data.rating.level, 2) + 50 * data.rating.level + 100
         const progress: number = Math.round(1210 * data.rating.exp / neededExp)
+        const users: Guild_User_Interface[] = await RatingPositions(interaction.member)
+        const position: number = users.findIndex(user => user.userID === member.id)
 
         // глоабльаные данные участника
-        const global_data = await client.db.getOrInsert<User_Interface>('users', { userID: user.id }, User_Basic(user.id))
-        const banner: Image = await loadImage(global_data.rankCard.url)
-        const color: HexColorString = global_data.rankCard.color
+        const userData = await client.db.getOrInsert<User_Interface>('users', { userID: member.id }, User_Basic(member.id))
+        const banner: Image = await loadImage(userData.rankCard.url)
+        const color: HexColorString = userData.rankCard.color
 
         // функция рисования скруленного прямоугольника
         function fillRoundedRect(x: number, y: number, w: number, h: number, r: number) {
@@ -62,11 +63,11 @@ export default new Command({
 
         // Рисуем текст
         ctx.fillStyle = '#ffffffff'
-        ctx.font = "70px Comfortaa Bold"
+        ctx.font = "70px Comfortaa"
         ctx.fillText(member.displayName, 640, 763)
-        ctx.font = "80px Comfortaa Bold"
-        ctx.fillText(`lv. ${data.rating.level}`, 640, 915)
-        ctx.fillText(`${data.rating.exp} / ${neededExp} exp`, (1920 - 70) - ctx.measureText(`${data.rating.exp} / ${neededExp} exp`).width, 915)
+        ctx.font = "80px Comfortaa"
+        ctx.fillText(`lv. ${data.rating.level} #${position +1}`, 640, 900)
+        ctx.fillText(`${data.rating.exp} / ${neededExp} exp`, (1920 - 70) - ctx.measureText(`${data.rating.exp} / ${neededExp} exp`).width, 900)
 
         // Сохранение области редактирования 
         ctx.save()
