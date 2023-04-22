@@ -1,45 +1,8 @@
 import { Command } from "@classes/Command";
+import { DescriptionOption, NameOption, PriceOption, RoleOption } from "@classes/CommandOptions";
 import { Guild_Interface, ShopItem } from "@interfaces/MongoDB";
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, EmbedBuilder } from "discord.js";
-
-const nameOption: ApplicationCommandOptionData = {
-    name: "name",
-    nameLocalizations: { ru: "название" },
-    description: "Укажите название предмета (до 30 символов)",
-    maxLength: 30,
-    type: ApplicationCommandOptionType.String,
-    required: true
-}
-
-const newNameOption: ApplicationCommandOptionData = {
-    name: "new-name",
-    nameLocalizations: { ru: "новое-название" },
-    description: "Укажите новое название предмета (до 30 символов)",
-    maxLength: 30,
-    type: ApplicationCommandOptionType.String
-}
-
-const descriptionOption: ApplicationCommandOptionData = {
-    name: "description",
-    nameLocalizations: { ru: "описание" },
-    description: "Укажите описание предмета (до 75 символов)",
-    maxLength: 75,
-    type: ApplicationCommandOptionType.String
-}
-
-const priceOption: ApplicationCommandOptionData = {
-    name: "price",
-    nameLocalizations: { ru: "стоимость" },
-    description: "Укажите стоимость предмета",
-    type: ApplicationCommandOptionType.Integer
-}
-
-const roleOption: ApplicationCommandOptionData = {
-    name: "role",
-    nameLocalizations: { ru: "роль" },
-    description: "Прикрепите роль к предмету",
-    type: ApplicationCommandOptionType.Role,
-}
+import { errorEmbed } from "@util/replier";
+import { ApplicationCommandOptionType, EmbedBuilder } from "discord.js";
 
 export default new Command({
     name: "item",
@@ -48,6 +11,7 @@ export default new Command({
     defaultMemberPermissions: ["ManageGuild"],
     dmPermission: false,
     run: async ({ interaction, client }) => {
+        if (!interaction.inCachedGuild()) return
         const subCommand = interaction.options.getSubcommand()
         const itemName = interaction.options.getString("name").toLowerCase()
         const newItemName = interaction.options.getString("new-name")?.toLowerCase()
@@ -63,10 +27,17 @@ export default new Command({
             description: itemDescription || oldItem?.description || null, // новое описание или описание существующего предмета если не указано, или ничего
             price: (itemPrice == 0) ? 0 : itemPrice || oldItem?.price || 0, // если новая цена ноль - ноль, если другая - то другая, если нет другой то ноль
             roleID: itemRole?.id || oldItem?.roleID || null //новая роль, если нет, то старая роль, иначе оставить пустым
-        }   
+        }
 
         const regExp = /[^А-ЯЁа-яё\s\d\w-.]/gi
-        if (item.name.match(regExp)?.length) return interaction.reply({ content: "Ошибка названия, найдены недопустимые символы!\nДопустимы только буквы и символы: \`[А-Я]\`, \`[A-Z]\`, \`[0-9]\`, \`.\` , \`_\` , \`-\`\nВ вашем названии использованы запрещенные: " + `\`${item.name.match(regExp).join("\` , \`")}\``, ephemeral: true })
+        if (item.name.match(regExp)?.length) return interaction.reply({
+            embeds: errorEmbed(
+                "Ошибка названия, найдены недопустимые символы!\n" +
+                "Допустимы только буквы и символы: \`[А-Я]\`, \`[A-Z]\`, \`[0-9]\`, \`.\` , \`_\` , \`-\`\n" +
+                "В вашем названии использованы запрещенные: " +
+                `\`${item.name.match(regExp).join("\` ; \`")}\``
+            )
+        })
 
         const embed = new EmbedBuilder()
             .setColor("#ffa55a")
@@ -80,27 +51,27 @@ export default new Command({
 
         switch (subCommand) {
             case "add": {
-                if (oldItem) return interaction.reply({ content: "Данный предмет уже существует!", ephemeral: true })
+                if (oldItem) return interaction.reply({ embeds: errorEmbed("Данный предмет уже существует!") })
                 await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $push: { shop: item } })
-                interaction.reply({ content: "Предмет успешно добавлен!", embeds: [embed], ephemeral: true })
+                interaction.reply({ content: "Предмет успешно добавлен!", embeds: [embed] })
                 break
             }
             case "info": {
-                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
-                interaction.reply({ embeds: [embed], ephemeral: true })
+                if (!oldItem) return interaction.reply({ embeds: errorEmbed("Такого предмета не существует!") })
+                interaction.reply({ embeds: [embed] })
                 break
             }
             case "edit": {
-                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
-                if (JSON.stringify(item) == JSON.stringify(item)) return interaction.reply("Вы не указали никаких изменений!")
+                if (!oldItem) return interaction.reply({ embeds: errorEmbed("Такого предмета не существует!") })
+                if (JSON.stringify(item) == JSON.stringify(item)) return interaction.reply({ embeds: errorEmbed("Вы не указали никаких изменений!") })
                 await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId, "shop.name": itemName }, { $set: { "shop.$": item } })
-                interaction.reply({ content: "Предмет успешно изменён!", embeds: [embed], ephemeral: true })
+                interaction.reply({ content: "Предмет успешно изменён!", embeds: [embed] })
                 break
             }
             case "remove": {
-                if (!oldItem) return interaction.reply({ content: "Такого предмета не существует!", ephemeral: true })
+                if (!oldItem) return interaction.reply({ embeds: errorEmbed("Такого предмета не существует!") })
                 await client.db.updateOne<Guild_Interface>('guilds', { guildID: interaction.guildId }, { $pull: { shop: { name: item.name } } })
-                interaction.reply({ content: `Предмет \`${item.name}\` успешно удалён!`, ephemeral: true })
+                interaction.reply({ content: `Предмет \`${item.name}\` успешно удалён!` })
                 break
             }
         }
@@ -109,26 +80,41 @@ export default new Command({
     options: [{
         name: 'add',
         nameLocalizations: { ru: "добавить" },
-        description: "Добавить предмет в магазин",
+        description: "Добавить новый предмет в магазин",
         type: ApplicationCommandOptionType.Subcommand,
-        options: [nameOption, descriptionOption, priceOption, roleOption]
+        options: [
+            NameOption("Название целевого предмета"),
+            DescriptionOption("Описание нового предмета"),
+            PriceOption("Стоимость нового предмета"),
+            RoleOption("Роль к новомо предмета")
+        ]
     }, {
         name: 'info',
         nameLocalizations: { ru: "информация" },
-        description: "Посмотреть предмет в магазина",
+        description: "Просмотреть информацию о предмете в магазине",
         type: ApplicationCommandOptionType.Subcommand,
-        options: [nameOption]
+        options: [
+            NameOption("Название целевого предмета")
+        ]
     }, {
         name: 'edit',
         nameLocalizations: { ru: "изменить" },
         description: "Изменить предмет в магазине",
         type: ApplicationCommandOptionType.Subcommand,
-        options: [nameOption, descriptionOption, priceOption, roleOption, newNameOption]
+        options: [
+            NameOption("Название целевого предмета"),
+            NameOption('Новое название целевого предмета', { name: "new-name", ruName: "новое-название", required: false }),
+            DescriptionOption('Новое описание целевого предмета'),
+            PriceOption("Новая стоимость целевого предмета"),
+            RoleOption("Новая роль целевого предмета")
+        ]
     }, {
         name: 'remove',
         nameLocalizations: { ru: "удалить" },
         description: "Удалить предмет из магазина",
         type: ApplicationCommandOptionType.Subcommand,
-        options: [nameOption]
+        options: [
+            NameOption("Название целевого предмета")
+        ]
     }]
 })

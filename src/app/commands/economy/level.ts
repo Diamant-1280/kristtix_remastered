@@ -1,4 +1,5 @@
 import { Command } from "@classes/Command";
+import { UserOption } from "@classes/CommandOptions";
 import { Guild_User_Interface } from "@interfaces/MongoDB";
 import { errorEmbed } from "@util/replier";
 import { ApplicationCommandOptionType, EmbedBuilder } from "discord.js";
@@ -15,31 +16,31 @@ export default new Command({
 
     const data = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guildId, userID: member.id })
 
-    interaction.reply({ embeds: [
-      new EmbedBuilder()
-        .setColor(0xffa55a)
-        .setTitle("Уровень изменен")
-        .setDescription(`Уровень участника <@${member.id}>: **\`${data.rating.level}\`** >>> **\`${level}\`** `)
-    ]})
+    interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor(0xffa55a)
+          .setTitle("Уровень изменен")
+          .setDescription(`Уровень участника <@${member.id}>: **\`${data.rating.level}\`** >>> **\`${level}\`** `)
+      ]
+    })
 
     data.rating.level = level
     data.rating.exp = 0
 
     client.db.save('guild-users', data)
   },
-  options: [{
-    name: "user",
-    nameLocalizations: { "ru": "участник" },
-    description: "Целевой участник",
-    type: ApplicationCommandOptionType.User
-  }, {
-    name: "level",
-    nameLocalizations: { "ru": "уровень" },
-    description: "Новый уровень",
-    type: ApplicationCommandOptionType.Integer,
-    minValue: 0,
-    maxValue: 999
-  }],
+  options: [
+    UserOption(),
+    {
+      name: "level",
+      nameLocalizations: { "ru": "уровень" },
+      description: "Новый уровень",
+      type: ApplicationCommandOptionType.Integer,
+      minValue: 0,
+      maxValue: 999
+    }
+  ],
   defaultMemberPermissions: ["ManageGuild"],
   dmPermission: false
 })

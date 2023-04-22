@@ -1,31 +1,20 @@
 import { Command } from "@classes/Command";
-import { ApplicationCommandOptionType, GuildMember, HexColorString, User } from "discord.js";
+import { GuildMember, HexColorString } from "discord.js";
 import { Canvas, createCanvas, loadImage, CanvasRenderingContext2D, Image } from 'canvas'
-import { User_Basic, User_Interface, Guild_User_Basic, Guild_User_Interface } from "@interfaces/MongoDB";
+import { User_Basic, User_Interface, Guild_User_Interface } from "@interfaces/MongoDB";
 import { RatingPositions } from "@util/DBTweaks";
-import { errorEmbed } from "@util/replier";
+import { UserOption, ShowOption } from "@classes/CommandOptions";
 export default new Command({
-    name: "ранг",
+    name: "rank",
+    nameLocalizations: { ru: "ранг" },
     description: "Показывает карточку ранга выбранного участника (или у вас)",
-    options: [{
-        name: "user",
-        description: "Участник, ранг которого вы хотите посмотреть",
-        type: ApplicationCommandOptionType.User,
-        nameLocalizations: { ru: "участник" }
-    }, {
-        name: "hide",
-        description: "Укажите, нужно ли отослать результат команды всем в чате",
-        type: ApplicationCommandOptionType.Boolean,
-        nameLocalizations: { ru: "скрыть" }
-    }],
+    options: [ UserOption(false), ShowOption() ],
 
     run: async ({ interaction, client }) => {
         if (!interaction.inCachedGuild()) return
         const member: GuildMember = interaction.options.getMember('user') || interaction.member
-        const hide: boolean = interaction.options.getBoolean('hide', false) || false
-        await interaction.deferReply({ ephemeral: hide })
-
-        if (member?.user.bot) return interaction.followUp({ content: "Боты не учавствуют в рейтинге, вы не можете запросить карточку ранга!", ephemeral: true })
+        const show: boolean = (interaction.options.getString('show')  == 'true') ? true : false
+        await interaction.deferReply({ ephemeral: !show })
 
         // данные участника на сервере
         const data = await client.db.getOne<Guild_User_Interface>('guild-users', { guildID: interaction.guild.id, userID: member.id })

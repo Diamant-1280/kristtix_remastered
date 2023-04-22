@@ -1,7 +1,8 @@
 import { Command } from "@classes/Command"
-import { Guild_User_Basic, Guild_User_Interface } from "@interfaces/MongoDB"
+import { UserOption } from "@classes/CommandOptions"
+import { Guild_User_Interface } from "@interfaces/MongoDB"
 import { RatingPositions } from "@util/DBTweaks"
-import { ApplicationCommandOptionType, EmbedBuilder } from "discord.js"
+import { EmbedBuilder } from "discord.js"
 export default new Command({
     name: "profile",
     nameLocalizations: { "ru": "профиль" },
@@ -19,7 +20,6 @@ export default new Command({
             dnd: "<:dnd:840285081229590540>Не беспокоить",
             offline: "<:offline:840285081553207296>Не в сети",
             invisible: "<:offline:840285081553207296>Не в сети",
-            null: "<:offline:840285081553207296>Не в сети",
             undefined: "<:offline:840285081553207296>Не в сети"
         }
 
@@ -54,15 +54,9 @@ export default new Command({
 
             ])
 
-
         interaction.followUp({ embeds: [embed] })
     },
 
     dmPermission: false,
-    options: [{
-        name: "user",
-        nameLocalizations: { "ru": "участник" },
-        description: "Целевой участник",
-        type: ApplicationCommandOptionType.User
-    }]
+    options: [UserOption(false)]
 })

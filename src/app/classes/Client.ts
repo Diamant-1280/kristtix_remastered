@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection } from 'discord.js'
+import { ApplicationCommandDataResolvable, Client, ClientEvents, Collection, Guild, GuildMember } from 'discord.js'
 import { RegisterCommandsOptions } from '@interfaces/Client'
 import { CommandType } from '@interfaces/Commands'
 import { Config } from '@interfaces/Config'
@@ -14,15 +14,14 @@ export class ExtendedClient extends Client {
         })
     }
 
-    public check = async (collection: string) => {
-        if (!collection) return "Oops! Missing collection name!"
+    
+    public check = async (collection: string = 'guild-users') => {
         const obj = await this.db.getMany(collection)
         return JSON.stringify(obj, null, 2)
     }
 
-    public set_commands = (guildID: string) => {
-        if (!guildID) return "Oops! Missing guildID!"
-        const guild = this.guilds.cache.get(guildID)
+    public reg = (guild: Guild) => {
+        if (!guild?.id) return "Oops! Missing guild!"
         if (!guild) return "Oops! Guild not found!"
         this.registerCommands({
             commands: this.slashCommands,
